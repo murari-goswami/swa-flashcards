@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Skills — Flashcards</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f0f4f8; --surface: #fff; --text: #1a202c; --muted: #718096;
+    --accent: #F9A825; --accent-dark: #F57F17; --accent-light: #fff8e1;
+    --border: #e2e8f0; --flip-time: 0.5s; --radius: 1rem;
+  }
+  [data-theme="dark"] {
+    --bg: #1a202c; --surface: #2d3748; --text: #e2e8f0; --muted: #a0aec0;
+    --accent: #ffca28; --accent-light: #5d4037;
+    --border: #4a5568;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    line-height: 1.6; padding: 2rem 1rem;
+    transition: background .3s, color .3s;
+  }
+
+  .header {
+    text-align: center; max-width: 48rem; margin: 0 auto 2.5rem;
+  }
+  .header h1 {
+    font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header p { color: var(--muted); margin-top: .5rem; font-size: .95rem; }
+
+  .tabs {
+    display: flex; justify-content: center; gap: .5rem;
+    flex-wrap: wrap; margin-bottom: 1.5rem;
+  }
+  .tabs button {
+    padding: .4rem 1rem; border: 2px solid var(--border); border-radius: 2rem;
+    background: var(--surface); color: var(--text); cursor: pointer;
+    font-size: .8rem; font-weight: 600; transition: all .2s;
+  }
+  .tabs button:hover { border-color: var(--accent); color: var(--accent); }
+  .tabs button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .controls {
+    display: flex; justify-content: center; gap: .75rem;
+    flex-wrap: wrap; margin-bottom: 2rem;
+  }
+  .controls button {
+    padding: .5rem 1.2rem; border: 1px solid var(--border); border-radius: 2rem;
+    background: var(--surface); color: var(--text); cursor: pointer;
+    font-size: .85rem; font-weight: 600; transition: all .2s;
+  }
+  .controls button:hover { border-color: var(--accent); color: var(--accent); }
+  .controls button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .counter {
+    text-align: center; color: var(--muted); font-size: .9rem; margin-bottom: 1.5rem;
+  }
+
+  .deck {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+    gap: 1.5rem; max-width: 74rem; margin: 0 auto; perspective: 1200px;
+  }
+
+  .card-wrapper { height: 26rem; cursor: pointer; }
+  .card-wrapper.single-view { grid-column: 1 / -1; max-width: 36rem; margin: 0 auto; height: 30rem; }
+
+  .card {
+    position: relative; width: 100%; height: 100%;
+    transition: transform var(--flip-time) ease;
+    transform-style: preserve-3d;
+  }
+  .card-wrapper.flipped .card { transform: rotateY(180deg); }
+
+  .card__face {
+    position: absolute; inset: 0; backface-visibility: hidden;
+    border-radius: var(--radius); padding: 1.5rem;
+    display: flex; flex-direction: column;
+    border: 1px solid var(--border); overflow-y: auto;
+    background: var(--surface);
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    transition: box-shadow .2s;
+  }
+  .card-wrapper:hover .card__face { box-shadow: 0 8px 24px rgba(0,0,0,.12); }
+
+  .card__front { justify-content: center; align-items: center; text-align: center; }
+  .card__back { transform: rotateY(180deg); }
+
+  .card__number {
+    position: absolute; top: 1rem; left: 1.2rem;
+    font-size: .75rem; font-weight: 700; color: var(--accent);
+    background: var(--accent-light); padding: .15rem .55rem; border-radius: 1rem;
+  }
+  .card__flip-hint {
+    position: absolute; bottom: .8rem; right: 1rem;
+    font-size: .7rem; color: var(--muted); opacity: .7;
+  }
+  .card__accent {
+    height: 4px; border-radius: 2px; margin-bottom: 1rem;
+    background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+  }
+
+  .card__front h2 {
+    font-size: 1.25rem; font-weight: 700; margin-bottom: .75rem;
+    line-height: 1.35;
+  }
+  .card__front .prompt {
+    font-size: .95rem; color: var(--muted); font-style: italic;
+  }
+
+  .card__back h3 {
+    font-size: 1rem; font-weight: 700; margin-bottom: .6rem;
+    color: var(--accent);
+  }
+  .card__back ul {
+    list-style: none; padding: 0; margin: 0;
+  }
+  .card__back li {
+    position: relative; padding: .35rem 0 .35rem 1.1rem;
+    font-size: .85rem; line-height: 1.45;
+    border-bottom: 1px solid var(--border);
+  }
+  .card__back li:last-child { border-bottom: none; }
+  .card__back li::before {
+    content: '▸'; position: absolute; left: 0; color: var(--accent); font-weight: 700;
+  }
+  .card__back strong { font-weight: 700; }
+
+  @media (max-width: 600px) {
+    .deck { grid-template-columns: 1fr; }
+    .card-wrapper { height: 30rem; }
+    body { padding: 1rem .5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Social Skills — Flashcards</h1>
+  <p>9 cards for SWA exam revision. Click a card to flip it.</p>
+</div>
+
+
+
+<div class="controls">
+  <button class="active" data-view="grid">Grid View</button>
+  <button data-view="single">One at a Time</button>
+  <button data-action="theme">Dark Mode</button>
+  <button data-action="flip-all">Flip All</button>
+</div>
+
+<div class="counter"><span id="progress">0</span> of <span id="total">0</span> cards flipped</div>
+
+<div class="deck" id="deck"></div>
+
+<script>
+const ALL_CARDS = [
+  {
+    "num": 1,
+    "title": "4C Learning Concept",
+    "prompt": "What is the 4C learning model and how does it structure effective training sessions?",
+    "points": [
+      "Four phases: <strong>Connect, Concept, Concrete Practice, Conclusion</strong>",
+      "<strong>Connect</strong>: activate prior knowledge and link to learner's experience",
+      "<strong>Concept</strong>: present new content in digestible, structured chunks",
+      "<strong>Concrete Practice</strong>: hands-on exercises to apply and internalize knowledge",
+      "<strong>Conclusion</strong>: summarize, reflect, and plan transfer to real work",
+      "Architect uses 4C to <strong>teach architecture decisions</strong> to dev teams",
+      "Active learning > passive lectures; <strong>70-20-10</strong> model supports this"
+    ]
+  },
+  {
+    "num": 2,
+    "title": "Communication",
+    "prompt": "Why is communication the architect\\'s most critical skill, and what models guide effective communication?",
+    "points": [
+      "<strong>Schulz von Thun</strong>: every message has 4 sides (fact, self-reveal, relationship, appeal)",
+      "<strong>Active listening</strong>: paraphrase, ask open questions, withhold judgment",
+      "<strong>Nonviolent Communication</strong> (Rosenberg): observation, feeling, need, request",
+      "Architects spend <strong>~70% of time communicating</strong>, not coding",
+      "<strong>Adapt communication style</strong> to audience (C-level vs developers vs testers)",
+      "Miscommunication is the <strong>#1 cause</strong> of architectural misalignment"
+    ]
+  },
+  {
+    "num": 3,
+    "title": "Peer Feedback (PEW Method)",
+    "prompt": "How does the PEW method structure constructive peer feedback?",
+    "points": [
+      "<strong>PEW</strong>: Perception, Effect, Wish — structured feedback framework",
+      "<strong>Perception</strong>: describe observable behavior without interpretation",
+      "<strong>Effect</strong>: explain the impact of the behavior on you or the team",
+      "<strong>Wish</strong>: state a concrete, actionable change request",
+      "Feedback should be <strong>timely, specific, and behavior-focused</strong> (not personal)",
+      "Receiving: <strong>listen, ask clarifying questions</strong>, don't defend immediately"
+    ]
+  },
+  {
+    "num": 4,
+    "title": "Leadership Without Formal Power",
+    "prompt": "How can architects lead effectively without formal authority over teams?",
+    "points": [
+      "Architects often have <strong>influence but no direct authority</strong> over dev teams",
+      "<strong>Expert power</strong>: credibility through technical competence and hands-on work",
+      "<strong>Referent power</strong>: trust built through relationships and consistent behavior",
+      "<strong>Servant leadership</strong>: remove obstacles, enable teams, share credit",
+      "Use <strong>persuasion over prescription</strong>: explain WHY behind architecture decisions",
+      "<strong>Build coalitions</strong>: align with tech leads, POs, and key developers first"
+    ]
+  },
+  {
+    "num": 5,
+    "title": "Motivation",
+    "prompt": "What motivational theories help architects understand and influence team behavior?",
+    "points": [
+      "<strong>Intrinsic motivation</strong> (autonomy, mastery, purpose) outperforms extrinsic rewards",
+      "<strong>Pink's Drive</strong>: Autonomy, Mastery, Purpose as three pillars of motivation",
+      "<strong>Herzberg</strong>: hygiene factors prevent dissatisfaction; motivators create satisfaction",
+      "<strong>Self-Determination Theory</strong>: competence, autonomy, relatedness are universal needs",
+      "Architects foster motivation by <strong>giving teams ownership</strong> of design decisions",
+      "Avoid <strong>micromanagement</strong> — it destroys autonomy and intrinsic motivation"
+    ]
+  },
+  {
+    "num": 6,
+    "title": "Stakeholder Presentation",
+    "prompt": "How should architects present architecture decisions to different stakeholder groups?",
+    "points": [
+      "<strong>Know your audience</strong>: C-level wants business impact; devs want technical detail",
+      "<strong>Pyramid Principle</strong> (Minto): lead with conclusion, then supporting arguments",
+      "Use <strong>visual aids</strong>: C4 diagrams, architecture decision matrices, trade-off tables",
+      "<strong>Storytelling</strong>: frame decisions as solutions to stakeholder problems",
+      "Address <strong>risks and trade-offs</strong> proactively — don't wait to be asked",
+      "Keep presentations <strong>short and focused</strong>; detailed backup in appendix"
+    ]
+  },
+  {
+    "num": 7,
+    "title": "Change Management and Fearless Change",
+    "prompt": "How does the Fearless Change pattern language help architects drive organizational adoption?",
+    "points": [
+      "<strong>Fearless Change</strong> (Rising/Manns): 48 patterns for introducing new ideas",
+      "<strong>Evangelist</strong>: passionate advocate who persistently promotes the change",
+      "<strong>Small Successes</strong>: demonstrate quick wins to build momentum and credibility",
+      "<strong>Ask for Help</strong>: involve skeptics early to convert resistance into ownership",
+      "<strong>Dedicated Champion</strong>: senior ally who provides political cover and resources",
+      "Change is <strong>emotional, not just rational</strong>; address feelings alongside facts"
+    ]
+  },
+  {
+    "num": 8,
+    "title": "Coaching and Sparring",
+    "prompt": "How do coaching and sparring sessions support architect development and team growth?",
+    "points": [
+      "<strong>Coaching</strong>: guide through questions, don't give answers directly",
+      "<strong>Sparring</strong>: peer-level challenge of ideas to stress-test architecture decisions",
+      "<strong>GROW model</strong>: Goal, Reality, Options, Will — structured coaching conversations",
+      "Architects need <strong>both coaching (receive) and mentoring (give)</strong> roles",
+      "<strong>Socratic questioning</strong> helps teams discover solutions independently",
+      "Regular sparring prevents <strong>confirmation bias</strong> in architecture decisions"
+    ]
+  },
+  {
+    "num": 9,
+    "title": "Self-Leadership and the Responsibility Process",
+    "prompt": "How does the Responsibility Process help architects move from blame to ownership?",
+    "points": [
+      "<strong>Responsibility Process</strong> (Avery): Denial → Blame → Justify → Shame → Obligation → Responsibility",
+      "Only at <strong>Responsibility</strong> level do you have full power to act and change",
+      "<strong>Quit</strong> is an escape at any stage — choosing to disengage from the problem",
+      "Self-leadership requires <strong>awareness</strong> of which stage you're currently in",
+      "Architects model <strong>ownership culture</strong> by taking responsibility for failures",
+      "<strong>Intention + Awareness + Confront</strong> are the three keys to reaching Responsibility"
+    ]
+  }
+];
+let activeCards = ALL_CARDS;
+let viewMode = 'grid';
+let currentIndex = 0;
+
+const deck = document.getElementById('deck');
+const progress = document.getElementById('progress');
+const total = document.getElementById('total');
+
+function renderCards() {
+  deck.innerHTML = '';
+  total.textContent = activeCards.length;
+  const cards = viewMode === 'single' ? [activeCards[currentIndex]] : activeCards;
+  cards.forEach((c, i) => {
+    const idx = viewMode === 'single' ? currentIndex : i;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'card-wrapper' + (viewMode === 'single' ? ' single-view' : '');
+    wrapper.dataset.index = idx;
+    wrapper.innerHTML = `
+      <div class="card">
+        <div class="card__face card__front">
+          <span class="card__number">${c.num} / ${activeCards.length}</span>
+          <div>
+            <h2>${c.title}</h2>
+            <p class="prompt">${c.prompt}</p>
+          </div>
+          <span class="card__flip-hint">click to flip</span>
+        </div>
+        <div class="card__face card__back">
+          <div class="card__accent"></div>
+          <h3>${c.title}</h3>
+          <ul>${c.points.map(p => '<li>' + p + '</li>').join('')}</ul>
+        </div>
+      </div>`;
+    wrapper.addEventListener('click', () => {
+      wrapper.classList.toggle('flipped');
+      updateProgress();
+    });
+    deck.appendChild(wrapper);
+  });
+
+  if (viewMode === 'single') {
+    const nav = document.createElement('div');
+    nav.style.cssText = 'display:flex;justify-content:center;gap:1rem;margin-top:1.5rem;grid-column:1/-1;';
+    const len = activeCards.length;
+    nav.innerHTML = `
+      <button style="padding:.5rem 1.2rem;border:1px solid var(--border);border-radius:2rem;background:var(--surface);color:var(--text);cursor:pointer;font-weight:600;" id="prev">← Previous</button>
+      <span style="line-height:2.2;color:var(--muted);font-size:.9rem;">${currentIndex + 1} / ${len}</span>
+      <button style="padding:.5rem 1.2rem;border:1px solid var(--border);border-radius:2rem;background:var(--surface);color:var(--text);cursor:pointer;font-weight:600;" id="next">Next →</button>`;
+    deck.appendChild(nav);
+    document.getElementById('prev').addEventListener('click', e => { e.stopPropagation(); currentIndex = (currentIndex - 1 + len) % len; renderCards(); });
+    document.getElementById('next').addEventListener('click', e => { e.stopPropagation(); currentIndex = (currentIndex + 1) % len; renderCards(); });
+  }
+}
+
+function updateProgress() {
+  progress.textContent = document.querySelectorAll('.card-wrapper.flipped').length;
+}
+
+document.querySelectorAll('[data-view]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-view]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    viewMode = btn.dataset.view;
+    currentIndex = 0;
+    renderCards();
+  });
+});
+
+document.querySelector('[data-action="theme"]').addEventListener('click', function() {
+  const dark = document.documentElement.dataset.theme === 'dark';
+  document.documentElement.dataset.theme = dark ? '' : 'dark';
+  this.textContent = dark ? 'Dark Mode' : 'Light Mode';
+  localStorage.setItem('flashcard-theme', dark ? '' : 'dark');
+});
+
+document.querySelector('[data-action="flip-all"]').addEventListener('click', () => {
+  const wrappers = document.querySelectorAll('.card-wrapper');
+  const allFlipped = [...wrappers].every(w => w.classList.contains('flipped'));
+  wrappers.forEach(w => w.classList.toggle('flipped', !allFlipped));
+  updateProgress();
+});
+
+document.addEventListener('keydown', e => {
+  if (viewMode !== 'single') return;
+  const len = activeCards.length;
+  if (e.key === 'ArrowLeft') { currentIndex = (currentIndex - 1 + len) % len; renderCards(); }
+  if (e.key === 'ArrowRight') { currentIndex = (currentIndex + 1) % len; renderCards(); }
+  if (e.key === ' ') { e.preventDefault(); document.querySelector('.card-wrapper')?.classList.toggle('flipped'); updateProgress(); }
+});
+
+// Tab filtering (combined page only)
+document.querySelectorAll('[data-chapter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-chapter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const ch = btn.dataset.chapter;
+    activeCards = ch === 'all' ? ALL_CARDS : ALL_CARDS.filter(c => c.chapter === ch);
+    currentIndex = 0;
+    renderCards();
+  });
+});
+
+// Restore theme
+if (localStorage.getItem('flashcard-theme') === 'dark') {
+  document.documentElement.dataset.theme = 'dark';
+  document.querySelector('[data-action="theme"]').textContent = 'Light Mode';
+}
+
+renderCards();
+</script>
+</body>
+</html>

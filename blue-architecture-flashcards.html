@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture — Flashcards</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f0f4f8; --surface: #fff; --text: #1a202c; --muted: #718096;
+    --accent: #2196F3; --accent-dark: #1565C0; --accent-light: #e3f2fd;
+    --border: #e2e8f0; --flip-time: 0.5s; --radius: 1rem;
+  }
+  [data-theme="dark"] {
+    --bg: #1a202c; --surface: #2d3748; --text: #e2e8f0; --muted: #a0aec0;
+    --accent: #63b3ed; --accent-light: #2a4365;
+    --border: #4a5568;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    line-height: 1.6; padding: 2rem 1rem;
+    transition: background .3s, color .3s;
+  }
+
+  .header {
+    text-align: center; max-width: 48rem; margin: 0 auto 2.5rem;
+  }
+  .header h1 {
+    font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header p { color: var(--muted); margin-top: .5rem; font-size: .95rem; }
+
+  .tabs {
+    display: flex; justify-content: center; gap: .5rem;
+    flex-wrap: wrap; margin-bottom: 1.5rem;
+  }
+  .tabs button {
+    padding: .4rem 1rem; border: 2px solid var(--border); border-radius: 2rem;
+    background: var(--surface); color: var(--text); cursor: pointer;
+    font-size: .8rem; font-weight: 600; transition: all .2s;
+  }
+  .tabs button:hover { border-color: var(--accent); color: var(--accent); }
+  .tabs button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .controls {
+    display: flex; justify-content: center; gap: .75rem;
+    flex-wrap: wrap; margin-bottom: 2rem;
+  }
+  .controls button {
+    padding: .5rem 1.2rem; border: 1px solid var(--border); border-radius: 2rem;
+    background: var(--surface); color: var(--text); cursor: pointer;
+    font-size: .85rem; font-weight: 600; transition: all .2s;
+  }
+  .controls button:hover { border-color: var(--accent); color: var(--accent); }
+  .controls button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .counter {
+    text-align: center; color: var(--muted); font-size: .9rem; margin-bottom: 1.5rem;
+  }
+
+  .deck {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+    gap: 1.5rem; max-width: 74rem; margin: 0 auto; perspective: 1200px;
+  }
+
+  .card-wrapper { height: 26rem; cursor: pointer; }
+  .card-wrapper.single-view { grid-column: 1 / -1; max-width: 36rem; margin: 0 auto; height: 30rem; }
+
+  .card {
+    position: relative; width: 100%; height: 100%;
+    transition: transform var(--flip-time) ease;
+    transform-style: preserve-3d;
+  }
+  .card-wrapper.flipped .card { transform: rotateY(180deg); }
+
+  .card__face {
+    position: absolute; inset: 0; backface-visibility: hidden;
+    border-radius: var(--radius); padding: 1.5rem;
+    display: flex; flex-direction: column;
+    border: 1px solid var(--border); overflow-y: auto;
+    background: var(--surface);
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    transition: box-shadow .2s;
+  }
+  .card-wrapper:hover .card__face { box-shadow: 0 8px 24px rgba(0,0,0,.12); }
+
+  .card__front { justify-content: center; align-items: center; text-align: center; }
+  .card__back { transform: rotateY(180deg); }
+
+  .card__number {
+    position: absolute; top: 1rem; left: 1.2rem;
+    font-size: .75rem; font-weight: 700; color: var(--accent);
+    background: var(--accent-light); padding: .15rem .55rem; border-radius: 1rem;
+  }
+  .card__flip-hint {
+    position: absolute; bottom: .8rem; right: 1rem;
+    font-size: .7rem; color: var(--muted); opacity: .7;
+  }
+  .card__accent {
+    height: 4px; border-radius: 2px; margin-bottom: 1rem;
+    background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+  }
+
+  .card__front h2 {
+    font-size: 1.25rem; font-weight: 700; margin-bottom: .75rem;
+    line-height: 1.35;
+  }
+  .card__front .prompt {
+    font-size: .95rem; color: var(--muted); font-style: italic;
+  }
+
+  .card__back h3 {
+    font-size: 1rem; font-weight: 700; margin-bottom: .6rem;
+    color: var(--accent);
+  }
+  .card__back ul {
+    list-style: none; padding: 0; margin: 0;
+  }
+  .card__back li {
+    position: relative; padding: .35rem 0 .35rem 1.1rem;
+    font-size: .85rem; line-height: 1.45;
+    border-bottom: 1px solid var(--border);
+  }
+  .card__back li:last-child { border-bottom: none; }
+  .card__back li::before {
+    content: '▸'; position: absolute; left: 0; color: var(--accent); font-weight: 700;
+  }
+  .card__back strong { font-weight: 700; }
+
+  @media (max-width: 600px) {
+    .deck { grid-template-columns: 1fr; }
+    .card-wrapper { height: 30rem; }
+    body { padding: 1rem .5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Architecture — Flashcards</h1>
+  <p>11 cards for SWA exam revision. Click a card to flip it.</p>
+</div>
+
+
+
+<div class="controls">
+  <button class="active" data-view="grid">Grid View</button>
+  <button data-view="single">One at a Time</button>
+  <button data-action="theme">Dark Mode</button>
+  <button data-action="flip-all">Flip All</button>
+</div>
+
+<div class="counter"><span id="progress">0</span> of <span id="total">0</span> cards flipped</div>
+
+<div class="deck" id="deck"></div>
+
+<script>
+const ALL_CARDS = [
+  {
+    "num": 1,
+    "title": "Goals-Principles-Decisions (GPD) Model",
+    "prompt": "What is the GPD chain and how does it connect requirements to implementation?",
+    "points": [
+      "<strong>GPD</strong> cascades: Requirement → Goal → Principle → Decision",
+      "<strong>Goals</strong>: what to achieve (consistency, usability, reusability)",
+      "<strong>Principles</strong>: general rules and boundaries derived from goals",
+      "<strong>Decisions</strong>: specific implementation steps fulfilling a principle",
+      "Ensures <strong>traceability</strong> — decisions traced back through principle to goal",
+      "Challenges discussed <strong>at the principle level</strong>, decisions re-opened without touching goals",
+      "<strong>Freedom of Choice</strong>: decisions can change while goals and principles remain stable"
+    ]
+  },
+  {
+    "num": 2,
+    "title": "Architecture Decision Records (ADR)",
+    "prompt": "What are ADRs, their templates, and how do they prevent architectural amnesia?",
+    "points": [
+      "<strong>5 intro questions</strong>: What, How, Where, How much, Difficulties",
+      "<strong>Nygard (2011)</strong> format: Title, Context, Decision, Status, Consequences",
+      "<strong>MADR</strong> adds Considered Options, Pros/Cons, and <strong>Decision Drivers</strong>",
+      "<strong>Decision Drivers</strong> are the <strong>hinge</strong> — turn opinion into traceable evaluation",
+      "Statuses: <strong>Proposed, Accepted, Rejected, Deprecated, Superseded</strong>",
+      "SWA duties: document decisions, ensure consistency, regular review, define process",
+      "<strong>Docs-as-Code</strong>: ADRs in repo, PR = review, merge = approval",
+      "<strong>Fitness Functions</strong>: validate code against ADRs, report violations automatically"
+    ]
+  },
+  {
+    "num": 3,
+    "title": "Architecture Documentation",
+    "prompt": "How do we define, view, and document software architecture?",
+    "points": [
+      "<strong>IEEE 1471</strong>: components, relationships, environment, governing principles",
+      "<strong>Booch</strong>: significant decisions measured by <strong>cost of change</strong>",
+      "<strong>Johnson</strong>: architecture is about the important stuff, whatever that is",
+      "<strong>4+1 Views</strong>: Use Case, Logical, Process, Development, Physical (+n extra)",
+      "<strong>C4 Model</strong>: Context (mgmt), Container (architects/DevOps), Component (dev), Code (dev)",
+      "<strong>arc42</strong> template: do not delete any part; risk: incomplete or overloaded",
+      "<strong>Drawing tools</strong> (Visio, PlantUML): lightweight; <strong>Modelling tools</strong> (MagicDraw): consistency",
+      "SWA duties: define needed views, keep views consistent, document decisions, review regularly"
+    ]
+  },
+  {
+    "num": 4,
+    "title": "Systematic Architecture Design",
+    "prompt": "How does the L-Model guide systematic architecture from forces to implementation?",
+    "points": [
+      "Architecture = <strong>Forces + Creativity + Communication + Decisions</strong>",
+      "<strong>Forces</strong> = Requirements (functional + quality) + Constraints (infra + non-technical)",
+      "<strong>ASR</strong> found via <strong>\"5 miles wide, 5 inches deep\"</strong> — shallow scan, then deep dive",
+      "<strong>L-Model</strong>: vertical (elicitation → domain → dynamics → scope) then horizontal (design → deploy → principles → increments)",
+      "Maturity: <strong>Draft → Walking Skeleton → MVP → MMP/MLP</strong>; Skeleton = end-to-end production quality",
+      "<strong>Inverse Conway</strong>: design target architecture first, reshape teams to match",
+      "<strong>Pyramid</strong>: max 3 levels (System → Subsystem → Component) + cross-cutting concerns",
+      "<strong>Strategic</strong> = system-wide decisions; <strong>Tactical</strong> = component-level decisions",
+      "Entire <strong>L-Model traversed every iteration</strong>; empty phases become no-op, never skipped"
+    ]
+  },
+  {
+    "num": 5,
+    "title": "Quality Scenarios and Design Tactics",
+    "prompt": "How do Quality Scenarios drive tactic selection and trade-off management?",
+    "points": [
+      "Quality Scenario has <strong>6 elements</strong>: Source, Stimulus, Artifact, Environment, Response, Response Measure",
+      "<strong>Utility Tree</strong>: Root (utility) → Quality Domains → Refinements → Leaf scenarios",
+      "Each leaf rated on <strong>Business Value</strong> and <strong>Architectural Impact</strong>; <strong>H/H = ASR</strong>",
+      "<strong>Fault Tolerance</strong> tactics: detection (heartbeat), redundancy, rollback, transactions",
+      "<strong>Security</strong> tactics: authenticate/authorize, intrusion detection, audit trail",
+      "<strong>Performance</strong> tactics: manage event rate, concurrency, scheduling policy",
+      "<strong>Modifiability</strong> tactics: semantic coherence, hide information, intermediary, polymorphism",
+      "<strong>Design Tactic</strong> = single building block; <strong>Design Strategy</strong> = overall plan combining tactics",
+      "Trade-off management: improving one quality often degrades another (e.g., security vs performance)"
+    ]
+  },
+  {
+    "num": 6,
+    "title": "Architectural and Design Patterns",
+    "prompt": "How are patterns selected, ordered, and what are their key trade-offs?",
+    "points": [
+      "<strong>Pattern Language</strong> template: problem/context, solution, behavior, consequences (trade-offs)",
+      "<strong>5-step selection</strong>: identify problem → check catalog → analyze benefits → analyze liabilities → pick simplest",
+      "Order: <strong>Quality Scenarios → Tactics → Patterns LAST</strong> (patterns implement tactics)",
+      "<strong>Layered</strong>: separation of concerns; liability = <strong>sinkhole anti-pattern</strong>, lower performance",
+      "<strong>Event-Driven</strong>: extreme decoupling + scalability; liability = <strong>traceability</strong> and debugging difficulty",
+      "<strong>Pipes & Filters</strong>: chainable transforms; liability = <strong>not suitable for UI</strong>, parse/serialize overhead",
+      "<strong>Microservices</strong>: independent deploy + scaling; liability = <strong>distributed transactions</strong>, monitoring complexity",
+      "<strong>Strangler</strong>: gradual monolith migration via facade routing to new services",
+      "<strong>Hexagonal</strong> (Ports & Adapters): uses <strong>Adapter pattern + Dependency Injection</strong>; flexible but more indirection"
+    ]
+  },
+  {
+    "num": 7,
+    "title": "Domain-Driven Design (DDD)",
+    "prompt": "What are the strategic and tactical building blocks of DDD?",
+    "points": [
+      "<strong>Ubiquitous Language</strong>: shared strict language in code, diagrams, speech",
+      "<strong>Bounded Contexts</strong>: models valid only within a specific context boundary",
+      "3 <strong>Subdomains</strong>: <strong>Core</strong> (full DDD), <strong>Supporting</strong> (simple), <strong>Generic</strong> (buy)",
+      "<strong>Context Map</strong> patterns: <strong>Shared Kernel</strong>, <strong>Conformist</strong>, <strong>Anti-corruption Layer (ACL)</strong>",
+      "<strong>Event Storming</strong> colors: orange=Event, blue=Command, yellow=Actor, purple=Policy",
+      "Tactical: <strong>Entity</strong> (identity+lifecycle), <strong>Value Object</strong> (immutable, no identity)",
+      "<strong>Aggregate</strong> (consistency boundary via Root), <strong>Repository</strong>, <strong>Factory</strong>",
+      "<strong>Anemic model</strong> = anti-pattern; <strong>Rich model</strong> encapsulates domain behavior",
+      "<strong>Domain Layer</strong> depends on nothing; Infrastructure implements domain interfaces",
+      "<strong>Conway's Law</strong>: team structure mirrors Bounded Context boundaries"
+    ]
+  },
+  {
+    "num": 8,
+    "title": "Architecture in Agile Environment",
+    "prompt": "How is architecture managed within agile development practices?",
+    "points": [
+      "<strong>Architectural Runway</strong>: architecture leads development by 1-2 sprints ahead",
+      "4 <strong>Enablers</strong>: Exploration, Architectural, Infrastructure, Compliance",
+      "NFR types: <strong>Story-like</strong> (deliver in sprint), <strong>Constraining</strong> (acceptance criteria), <strong>Cross-cutting</strong> (spike+DoD)",
+      "<strong>DoD for Architecture</strong>: done, documented (ADR), communicated, validated (PoC)",
+      "<strong>Architecture Owner</strong>: part-time team representative, codes and communicates",
+      "<strong>Tiger Teams</strong> conquer first; <strong>Travellers</strong> rotate between teams spreading know-how",
+      "<strong>Simplicity before generality</strong>; hard-coded over excessive configuration",
+      "Architecture smells: too much abstraction, futuristic design, paper architecture",
+      "Decide at <strong>last reasonable moment</strong>: max knowledge, no team blocking",
+      "<strong>Spikes</strong>: research tasks where goal is learning, not delivery"
+    ]
+  },
+  {
+    "num": 9,
+    "title": "Architecture Refactoring",
+    "prompt": "How do you manage architectural refactoring and technical debt?",
+    "points": [
+      "<strong>Lehman's 2nd Law</strong>: system complexity grows naturally, causing design erosion",
+      "Smells: <strong>External</strong> (failing builds, slow deploy) vs <strong>Internal</strong> (cyclic deps, duplication)",
+      "4 levels: <strong>Class</strong> (developer/task) → <strong>Component</strong> (team/backlog) → <strong>Subsystem</strong> (epic) → <strong>System</strong> (project/CTO)",
+      "<strong>Reengineering</strong> = reverse + forward engineering; <strong>Rewriting</strong> = discard and rebuild",
+      "<strong>Tech Debt Quadrant</strong>: Deliberate/Inadvertent × Prudent/Reckless (4 quadrants)",
+      "Financial metaphor: <strong>loan</strong> (quick delivery), <strong>interest</strong> (costly maintenance), <strong>repayment</strong> (refactor)",
+      "6 steps: root cause → changes → <strong>Business Case</strong> (ROI) → present → plan → schedule",
+      "<strong>Corridors</strong>: reserved capacity (e.g. 15% per sprint) for maintenance",
+      "<strong>Triggers</strong>: automatic response when metrics exceed limits (e.g. Sonar red)",
+      "Measure debt: static analysis, velocity drops, change density in components"
+    ]
+  },
+  {
+    "num": 10,
+    "title": "Experience — Architecture",
+    "prompt": "What cross-cutting lessons emerge from real-world architecture examples?",
+    "points": [
+      "<strong>Make the invisible visible</strong>: latency diagram, ADR index, dependency cycle",
+      "<strong>Short-term workaround + documented repayment</strong> is prudent, not sloppy",
+      "<strong>Decide against drivers, not opinions</strong>: GPD and MADR enable principled re-opening",
+      "<strong>Bound what grows</strong>: Claim-Check and latency budgets cap scaling dimensions",
+      "<strong>Architecture is a social activity</strong>: PO, PM, domain experts appear everywhere",
+      "Non-technical forces can <strong>defeat technically correct architecture</strong> (adoption, trust)",
+      "Walking Skeleton cheapest risk reducer <strong>before product-market fit</strong>"
+    ]
+  },
+  {
+    "num": 11,
+    "title": "Systematic Architecture Design",
+    "prompt": "How does the L-model drive systematic architecture from forces to implementation?",
+    "points": [
+      "Architecture = <strong>Forces + Creativity + Communication + Decisions</strong>",
+      "<strong>Forces = Requirements + Constraints</strong>; constraints include non-technical ones",
+      "<strong>ASR</strong> identified via <strong>5 miles wide, 5 inches deep</strong> method",
+      "<strong>L-model</strong>: vertical (elicit, domain, dynamics, scope) then horizontal (design to increments)",
+      "Maturity: <strong>Initial Draft → Walking Skeleton → MVP → MMP/MLP</strong>",
+      "<strong>Pyramid model</strong>: max 3 levels (System → Subsystem → Component) + cross-cutting",
+      "<strong>Inverse Conway Maneuver</strong>: design architecture first, then reorganize teams to match"
+    ]
+  }
+];
+let activeCards = ALL_CARDS;
+let viewMode = 'grid';
+let currentIndex = 0;
+
+const deck = document.getElementById('deck');
+const progress = document.getElementById('progress');
+const total = document.getElementById('total');
+
+function renderCards() {
+  deck.innerHTML = '';
+  total.textContent = activeCards.length;
+  const cards = viewMode === 'single' ? [activeCards[currentIndex]] : activeCards;
+  cards.forEach((c, i) => {
+    const idx = viewMode === 'single' ? currentIndex : i;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'card-wrapper' + (viewMode === 'single' ? ' single-view' : '');
+    wrapper.dataset.index = idx;
+    wrapper.innerHTML = `
+      <div class="card">
+        <div class="card__face card__front">
+          <span class="card__number">${c.num} / ${activeCards.length}</span>
+          <div>
+            <h2>${c.title}</h2>
+            <p class="prompt">${c.prompt}</p>
+          </div>
+          <span class="card__flip-hint">click to flip</span>
+        </div>
+        <div class="card__face card__back">
+          <div class="card__accent"></div>
+          <h3>${c.title}</h3>
+          <ul>${c.points.map(p => '<li>' + p + '</li>').join('')}</ul>
+        </div>
+      </div>`;
+    wrapper.addEventListener('click', () => {
+      wrapper.classList.toggle('flipped');
+      updateProgress();
+    });
+    deck.appendChild(wrapper);
+  });
+
+  if (viewMode === 'single') {
+    const nav = document.createElement('div');
+    nav.style.cssText = 'display:flex;justify-content:center;gap:1rem;margin-top:1.5rem;grid-column:1/-1;';
+    const len = activeCards.length;
+    nav.innerHTML = `
+      <button style="padding:.5rem 1.2rem;border:1px solid var(--border);border-radius:2rem;background:var(--surface);color:var(--text);cursor:pointer;font-weight:600;" id="prev">← Previous</button>
+      <span style="line-height:2.2;color:var(--muted);font-size:.9rem;">${currentIndex + 1} / ${len}</span>
+      <button style="padding:.5rem 1.2rem;border:1px solid var(--border);border-radius:2rem;background:var(--surface);color:var(--text);cursor:pointer;font-weight:600;" id="next">Next →</button>`;
+    deck.appendChild(nav);
+    document.getElementById('prev').addEventListener('click', e => { e.stopPropagation(); currentIndex = (currentIndex - 1 + len) % len; renderCards(); });
+    document.getElementById('next').addEventListener('click', e => { e.stopPropagation(); currentIndex = (currentIndex + 1) % len; renderCards(); });
+  }
+}
+
+function updateProgress() {
+  progress.textContent = document.querySelectorAll('.card-wrapper.flipped').length;
+}
+
+document.querySelectorAll('[data-view]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-view]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    viewMode = btn.dataset.view;
+    currentIndex = 0;
+    renderCards();
+  });
+});
+
+document.querySelector('[data-action="theme"]').addEventListener('click', function() {
+  const dark = document.documentElement.dataset.theme === 'dark';
+  document.documentElement.dataset.theme = dark ? '' : 'dark';
+  this.textContent = dark ? 'Dark Mode' : 'Light Mode';
+  localStorage.setItem('flashcard-theme', dark ? '' : 'dark');
+});
+
+document.querySelector('[data-action="flip-all"]').addEventListener('click', () => {
+  const wrappers = document.querySelectorAll('.card-wrapper');
+  const allFlipped = [...wrappers].every(w => w.classList.contains('flipped'));
+  wrappers.forEach(w => w.classList.toggle('flipped', !allFlipped));
+  updateProgress();
+});
+
+document.addEventListener('keydown', e => {
+  if (viewMode !== 'single') return;
+  const len = activeCards.length;
+  if (e.key === 'ArrowLeft') { currentIndex = (currentIndex - 1 + len) % len; renderCards(); }
+  if (e.key === 'ArrowRight') { currentIndex = (currentIndex + 1) % len; renderCards(); }
+  if (e.key === ' ') { e.preventDefault(); document.querySelector('.card-wrapper')?.classList.toggle('flipped'); updateProgress(); }
+});
+
+// Tab filtering (combined page only)
+document.querySelectorAll('[data-chapter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-chapter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const ch = btn.dataset.chapter;
+    activeCards = ch === 'all' ? ALL_CARDS : ALL_CARDS.filter(c => c.chapter === ch);
+    currentIndex = 0;
+    renderCards();
+  });
+});
+
+// Restore theme
+if (localStorage.getItem('flashcard-theme') === 'dark') {
+  document.documentElement.dataset.theme = 'dark';
+  document.querySelector('[data-action="theme"]').textContent = 'Light Mode';
+}
+
+renderCards();
+</script>
+</body>
+</html>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test & Quality — Flashcards</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f0f4f8; --surface: #fff; --text: #1a202c; --muted: #718096;
+    --accent: #F44336; --accent-dark: #C62828; --accent-light: #ffebee;
+    --border: #e2e8f0; --flip-time: 0.5s; --radius: 1rem;
+  }
+  [data-theme="dark"] {
+    --bg: #1a202c; --surface: #2d3748; --text: #e2e8f0; --muted: #a0aec0;
+    --accent: #ef5350; --accent-light: #b71c1c;
+    --border: #4a5568;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    line-height: 1.6; padding: 2rem 1rem;
+    transition: background .3s, color .3s;
+  }
+
+  .header {
+    text-align: center; max-width: 48rem; margin: 0 auto 2.5rem;
+  }
+  .header h1 {
+    font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header p { color: var(--muted); margin-top: .5rem; font-size: .95rem; }
+
+  .tabs {
+    display: flex; justify-content: center; gap: .5rem;
+    flex-wrap: wrap; margin-bottom: 1.5rem;
+  }
+  .tabs button {
+    padding: .4rem 1rem; border: 2px solid var(--border); border-radius: 2rem;
+    background: var(--surface); color: var(--text); cursor: pointer;
+    font-size: .8rem; font-weight: 600; transition: all .2s;
+  }
+  .tabs button:hover { border-color: var(--accent); color: var(--accent); }
+  .tabs button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .controls {
+    display: flex; justify-content: center; gap: .75rem;
+    flex-wrap: wrap; margin-bottom: 2rem;
+  }
+  .controls button {
+    padding: .5rem 1.2rem; border: 1px solid var(--border); border-radius: 2rem;
+    background: var(--surface); color: var(--text); cursor: pointer;
+    font-size: .85rem; font-weight: 600; transition: all .2s;
+  }
+  .controls button:hover { border-color: var(--accent); color: var(--accent); }
+  .controls button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .counter {
+    text-align: center; color: var(--muted); font-size: .9rem; margin-bottom: 1.5rem;
+  }
+
+  .deck {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+    gap: 1.5rem; max-width: 74rem; margin: 0 auto; perspective: 1200px;
+  }
+
+  .card-wrapper { height: 26rem; cursor: pointer; }
+  .card-wrapper.single-view { grid-column: 1 / -1; max-width: 36rem; margin: 0 auto; height: 30rem; }
+
+  .card {
+    position: relative; width: 100%; height: 100%;
+    transition: transform var(--flip-time) ease;
+    transform-style: preserve-3d;
+  }
+  .card-wrapper.flipped .card { transform: rotateY(180deg); }
+
+  .card__face {
+    position: absolute; inset: 0; backface-visibility: hidden;
+    border-radius: var(--radius); padding: 1.5rem;
+    display: flex; flex-direction: column;
+    border: 1px solid var(--border); overflow-y: auto;
+    background: var(--surface);
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    transition: box-shadow .2s;
+  }
+  .card-wrapper:hover .card__face { box-shadow: 0 8px 24px rgba(0,0,0,.12); }
+
+  .card__front { justify-content: center; align-items: center; text-align: center; }
+  .card__back { transform: rotateY(180deg); }
+
+  .card__number {
+    position: absolute; top: 1rem; left: 1.2rem;
+    font-size: .75rem; font-weight: 700; color: var(--accent);
+    background: var(--accent-light); padding: .15rem .55rem; border-radius: 1rem;
+  }
+  .card__flip-hint {
+    position: absolute; bottom: .8rem; right: 1rem;
+    font-size: .7rem; color: var(--muted); opacity: .7;
+  }
+  .card__accent {
+    height: 4px; border-radius: 2px; margin-bottom: 1rem;
+    background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+  }
+
+  .card__front h2 {
+    font-size: 1.25rem; font-weight: 700; margin-bottom: .75rem;
+    line-height: 1.35;
+  }
+  .card__front .prompt {
+    font-size: .95rem; color: var(--muted); font-style: italic;
+  }
+
+  .card__back h3 {
+    font-size: 1rem; font-weight: 700; margin-bottom: .6rem;
+    color: var(--accent);
+  }
+  .card__back ul {
+    list-style: none; padding: 0; margin: 0;
+  }
+  .card__back li {
+    position: relative; padding: .35rem 0 .35rem 1.1rem;
+    font-size: .85rem; line-height: 1.45;
+    border-bottom: 1px solid var(--border);
+  }
+  .card__back li:last-child { border-bottom: none; }
+  .card__back li::before {
+    content: '▸'; position: absolute; left: 0; color: var(--accent); font-weight: 700;
+  }
+  .card__back strong { font-weight: 700; }
+
+  @media (max-width: 600px) {
+    .deck { grid-template-columns: 1fr; }
+    .card-wrapper { height: 30rem; }
+    body { padding: 1rem .5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Test & Quality — Flashcards</h1>
+  <p>14 cards for SWA exam revision. Click a card to flip it.</p>
+</div>
+
+
+
+<div class="controls">
+  <button class="active" data-view="grid">Grid View</button>
+  <button data-view="single">One at a Time</button>
+  <button data-action="theme">Dark Mode</button>
+  <button data-action="flip-all">Flip All</button>
+</div>
+
+<div class="counter"><span id="progress">0</span> of <span id="total">0</span> cards flipped</div>
+
+<div class="deck" id="deck"></div>
+
+<script>
+const ALL_CARDS = [
+  {
+    "num": 1,
+    "title": "Value of Testing, Test Exit Criteria",
+    "prompt": "What determines when testing should stop, and how does the Cost of Quality model guide testing investment?",
+    "points": [
+      "<strong>Cost of Quality</strong> = prevention + appraisal + failure costs",
+      "Sweet spot: marginal cost of next bug exceeds <strong>expected loss</strong>",
+      "<strong>Test exit criteria</strong> define conditions to end a testing phase",
+      "Testing provides <strong>information</strong> about quality, not quality itself",
+      "<strong>Residual risk</strong> remains after testing; must be communicated to stakeholders",
+      "<strong>Absence-of-errors fallacy</strong>: bug-free software can still fail users"
+    ]
+  },
+  {
+    "num": 2,
+    "title": "Software Testing and Quality",
+    "prompt": "How do QA, QC, and Testing differ, and what are the seven principles of software testing?",
+    "points": [
+      "<strong>QA</strong> = process-focused prevention; <strong>QC</strong> = product conformity checks",
+      "<strong>Verification</strong> (building product right) vs <strong>Validation</strong> (building right product)",
+      "Seven principles include <strong>defect clustering</strong> and <strong>pesticide paradox</strong>",
+      "<strong>Exhaustive testing</strong> is impossible; use risk-based prioritization",
+      "<strong>Design for Testability</strong> uses DI and Humble Object patterns",
+      "<strong>Test strategy</strong> is static/high-level; <strong>test plan</strong> is project-specific",
+      "Testability is a key <strong>non-functional requirement</strong> for architecture"
+    ]
+  },
+  {
+    "num": 3,
+    "title": "Test Levels, Test Pyramid",
+    "prompt": "What are the four test levels, and how do the Testing Pyramid and Testing Trophy differ in strategy?",
+    "points": [
+      "Four levels: <strong>Unit, Integration, System, Acceptance</strong> testing",
+      "<strong>Testing Pyramid</strong> (Cohn): broad unit base, narrow E2E top",
+      "<strong>Testing Trophy</strong> (Dodds): emphasizes integration + static analysis",
+      "<strong>Ice Cream Cone</strong> anti-pattern inverts pyramid with excessive E2E",
+      "<strong>Shift-left</strong> finds defects early at lowest, cheapest test level",
+      "Architecture must support <strong>isolation and DI</strong> to fill pyramid base"
+    ]
+  },
+  {
+    "num": 4,
+    "title": "Unit Testing",
+    "prompt": "What defines a good unit test, and how do test doubles, coverage metrics, and TDD support unit-level verification?",
+    "points": [
+      "<strong>SUT/CUT</strong>: smallest independently testable code element in isolation",
+      "Test doubles: <strong>Stub, Mock, Spy, Fake, Dummy</strong> replace dependencies",
+      "Structural coverage: <strong>Statement, Branch, MC/DC</strong> (ASIL D requires MC/DC)",
+      "<strong>TDD Red-Green-Refactor</strong> drives design and ensures early coverage",
+      "<strong>Over-mocking</strong> couples tests to implementation, breaking on refactor",
+      "<strong>Host vs Target</strong>: fast CI feedback vs real compiler/HW fidelity",
+      "<strong>Humble Object</strong> separates testable logic from untestable environment"
+    ]
+  },
+  {
+    "num": 5,
+    "title": "Integration Testing",
+    "prompt": "What integration strategies exist, and how does integration testing verify component interactions?",
+    "points": [
+      "Strategies: <strong>Top-Down, Bottom-Up, Sandwich, Big-Bang</strong> integration",
+      "<strong>Test Driver</strong> calls SUT from above; <strong>Test Stub</strong> replaces below",
+      "<strong>HSI testing</strong> verifies hardware-software interface correctness",
+      "<strong>Contract Testing / CDC</strong> validates interface compatibility independently",
+      "Resource allocation testing checks <strong>RAM, ROM, Stack, CPU</strong> usage",
+      "<strong>Fault injection</strong> verifies error handling and recovery mechanisms",
+      "<strong>Bidirectional traceability</strong> (SRTM) links requirements to test cases"
+    ]
+  },
+  {
+    "num": 6,
+    "title": "Contract Testing",
+    "prompt": "How do Consumer-Driven Contracts prevent integration failures in distributed systems?",
+    "points": [
+      "<strong>CDC</strong>: consumer defines expected provider behavior in a contract",
+      "<strong>Pact framework</strong> generates pact files from consumer test expectations",
+      "<strong>Mock drift</strong> problem: local mocks diverge from real provider behavior",
+      "<strong>Provider States</strong> set up required preconditions for contract verification",
+      "<strong>Pact Broker</strong> shares and versions contracts across CI/CD pipelines",
+      "Contracts verify <strong>interface compatibility</strong>, not business logic",
+      "Enables <strong>independent deployability</strong> of services without full E2E tests"
+    ]
+  },
+  {
+    "num": 7,
+    "title": "Systematic Test Design",
+    "prompt": "What is the systematic test design process, and how do black-box and white-box techniques complement each other?",
+    "points": [
+      "<strong>Test basis</strong>: requirements, architecture, specs drive test derivation",
+      "Black-box: <strong>Equivalence Partitioning, BVA, State-based</strong> testing",
+      "White-box: <strong>Statement, Branch, Path</strong> coverage of code structure",
+      "<strong>Test oracle</strong> defines expected results for pass/fail evaluation",
+      "<strong>SRTM</strong> traces requirements to test cases bidirectionally",
+      "STD is a <strong>process/methodology</strong>; TDT are architectural design patterns"
+    ]
+  },
+  {
+    "num": 8,
+    "title": "Test Design Tactics",
+    "prompt": "How do Test Design Tactics translate a test strategy into specific, measurable test cases?",
+    "points": [
+      "<strong>TDT</strong> reduce infinite input space to optimal finite test scenarios",
+      "<strong>EP</strong> divides domain into valid/invalid equivalence classes",
+      "<strong>BVA</strong> tests boundary values B, B-delta, B+delta for off-by-one errors",
+      "<strong>Decision tables</strong> expose missing or contradictory requirement rules",
+      "<strong>State transition</strong> testing: 0-switch (states) vs 1-switch (sequences)",
+      "<strong>MC/DC</strong> required for safety-critical code (ASIL D / ISO 26262)",
+      "Architecture needs <strong>controllability and observability</strong> to apply TDT"
+    ]
+  },
+  {
+    "num": 9,
+    "title": "Test-Driven Development (TDD)",
+    "prompt": "Why is TDD considered a design technique rather than just a testing method?",
+    "points": [
+      "<strong>Red-Green-Refactor</strong>: fail test, minimal code, clean up duplication",
+      "TDD is primarily <strong>analysis and design</strong> (Test-Driven Design), not just QA",
+      "Enforces <strong>SOLID principles</strong>, DI, low coupling, and high cohesion",
+      "<strong>Sociable</strong> (Detroit) tests real collaborators; <strong>Solitary</strong> (London) mocks all",
+      "Tests serve as <strong>living executable documentation</strong> of API behavior",
+      "TDD alone cannot cover <strong>NFRs</strong>: performance, concurrency, safety"
+    ]
+  },
+  {
+    "num": 10,
+    "title": "Behavior Driven Development (BDD)",
+    "prompt": "How does BDD bridge the communication gap between business and technical teams through executable specifications?",
+    "points": [
+      "Uses <strong>Gherkin</strong> format: Given (context), When (action), Then (result)",
+      "<strong>Three Amigos</strong>: BA + Developer + Tester align on examples before coding",
+      "<strong>Outside-In</strong> development drives architecture from acceptance criteria inward",
+      "<strong>Living Documentation</strong> auto-generated from CI test execution results",
+      "<strong>Declarative</strong> scenarios describe business intent, not UI click steps",
+      "Requires <strong>layered/hexagonal architecture</strong> to isolate tests from infrastructure"
+    ]
+  },
+  {
+    "num": 11,
+    "title": "Risk Based Testing",
+    "prompt": "How does Risk-Based Testing prioritize testing effort using risk assessment?",
+    "points": [
+      "Risk = <strong>Likelihood x Impact</strong>; prioritizes where failure hurts most",
+      "<strong>Product risk</strong> (quality) is mitigable by testing; <strong>project risk</strong> is not",
+      "<strong>RPN</strong> (Risk Priority Number) ranks risks by probability, impact, detectability",
+      "<strong>FMEA</strong> for safety-critical; <strong>PRAM</strong> for lightweight risk analysis",
+      "<strong>Depth-first</strong> targets high-risk items; <strong>Breadth-first</strong> covers all areas",
+      "Risk register must be <strong>continuously updated</strong>, not frozen after kick-off",
+      "<strong>3 Amigos</strong> bring business, dev, and QA perspectives to risk assessment"
+    ]
+  },
+  {
+    "num": 12,
+    "title": "Testing Non-Functional Requirements (NFR Testing)",
+    "prompt": "How are quality attributes specified, measured, and tested across architecture and test levels?",
+    "points": [
+      "NFR testing verifies <strong>how well</strong> a system performs, not what it does",
+      "<strong>Quality Attribute Scenario</strong>: 6-part format with measurable response metric",
+      "<strong>Utility Tree</strong> prioritizes NFRs by business value and architectural risk",
+      "<strong>FURPS+</strong> model: Functionality, Usability, Reliability, Performance, Supportability",
+      "<strong>Fault Injection</strong> deliberately introduces faults to verify safety mechanisms",
+      "Quality cannot be <strong>tested in</strong>; testing only verifies architectural decisions",
+      "<strong>Shift-left NFR</strong>: test reliability and performance early, not only at end"
+    ]
+  },
+  {
+    "num": 13,
+    "title": "Design for Testability",
+    "prompt": "What architectural tactics make software testable, and what are the key trade-offs?",
+    "points": [
+      "Two pillars: <strong>Controllability</strong> (set inputs/states) and <strong>Observability</strong> (monitor outputs)",
+      "<strong>Humble Object</strong> extracts testable logic from untestable framework code",
+      "<strong>Dependency Injection</strong> enables test doubles and component isolation",
+      "<strong>Front-door</strong> tests public API; <strong>back-door</strong> uses testability interfaces",
+      "Trade-offs: testability vs <strong>encapsulation, performance, and security</strong>",
+      "James Bach's 5 dimensions: intrinsic, epistemic, project, subjective, value",
+      "DFT can save up to <strong>10% of total project budget</strong> through early defect detection"
+    ]
+  },
+  {
+    "num": 14,
+    "title": "Internal Software Quality",
+    "prompt": "How does internal software quality relate to testability, and what are the three levels of code quality?",
+    "points": [
+      "<strong>Internal quality</strong> = static code/architecture properties (ISO 9126/25010)",
+      "Three levels: <strong>Micro</strong> (lines), <strong>Macro</strong> (classes/SOLID), <strong>Architecture</strong> (layers/cycles)",
+      "<strong>Quality Management Chain</strong>: Process -> Internal -> External -> Quality-in-Use",
+      "<strong>CQM</strong>: static analysis, coding guidelines, metrics, peer reviews",
+      "<strong>Defect Gap Analysis</strong> tracks phase gap between error introduction and detection",
+      "Quality cannot be <strong>tested in</strong>; development and architecture create quality",
+      "Architect acts as <strong>protector of internal quality</strong> across all three levels"
+    ]
+  }
+];
+let activeCards = ALL_CARDS;
+let viewMode = 'grid';
+let currentIndex = 0;
+
+const deck = document.getElementById('deck');
+const progress = document.getElementById('progress');
+const total = document.getElementById('total');
+
+function renderCards() {
+  deck.innerHTML = '';
+  total.textContent = activeCards.length;
+  const cards = viewMode === 'single' ? [activeCards[currentIndex]] : activeCards;
+  cards.forEach((c, i) => {
+    const idx = viewMode === 'single' ? currentIndex : i;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'card-wrapper' + (viewMode === 'single' ? ' single-view' : '');
+    wrapper.dataset.index = idx;
+    wrapper.innerHTML = `
+      <div class="card">
+        <div class="card__face card__front">
+          <span class="card__number">${c.num} / ${activeCards.length}</span>
+          <div>
+            <h2>${c.title}</h2>
+            <p class="prompt">${c.prompt}</p>
+          </div>
+          <span class="card__flip-hint">click to flip</span>
+        </div>
+        <div class="card__face card__back">
+          <div class="card__accent"></div>
+          <h3>${c.title}</h3>
+          <ul>${c.points.map(p => '<li>' + p + '</li>').join('')}</ul>
+        </div>
+      </div>`;
+    wrapper.addEventListener('click', () => {
+      wrapper.classList.toggle('flipped');
+      updateProgress();
+    });
+    deck.appendChild(wrapper);
+  });
+
+  if (viewMode === 'single') {
+    const nav = document.createElement('div');
+    nav.style.cssText = 'display:flex;justify-content:center;gap:1rem;margin-top:1.5rem;grid-column:1/-1;';
+    const len = activeCards.length;
+    nav.innerHTML = `
+      <button style="padding:.5rem 1.2rem;border:1px solid var(--border);border-radius:2rem;background:var(--surface);color:var(--text);cursor:pointer;font-weight:600;" id="prev">← Previous</button>
+      <span style="line-height:2.2;color:var(--muted);font-size:.9rem;">${currentIndex + 1} / ${len}</span>
+      <button style="padding:.5rem 1.2rem;border:1px solid var(--border);border-radius:2rem;background:var(--surface);color:var(--text);cursor:pointer;font-weight:600;" id="next">Next →</button>`;
+    deck.appendChild(nav);
+    document.getElementById('prev').addEventListener('click', e => { e.stopPropagation(); currentIndex = (currentIndex - 1 + len) % len; renderCards(); });
+    document.getElementById('next').addEventListener('click', e => { e.stopPropagation(); currentIndex = (currentIndex + 1) % len; renderCards(); });
+  }
+}
+
+function updateProgress() {
+  progress.textContent = document.querySelectorAll('.card-wrapper.flipped').length;
+}
+
+document.querySelectorAll('[data-view]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-view]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    viewMode = btn.dataset.view;
+    currentIndex = 0;
+    renderCards();
+  });
+});
+
+document.querySelector('[data-action="theme"]').addEventListener('click', function() {
+  const dark = document.documentElement.dataset.theme === 'dark';
+  document.documentElement.dataset.theme = dark ? '' : 'dark';
+  this.textContent = dark ? 'Dark Mode' : 'Light Mode';
+  localStorage.setItem('flashcard-theme', dark ? '' : 'dark');
+});
+
+document.querySelector('[data-action="flip-all"]').addEventListener('click', () => {
+  const wrappers = document.querySelectorAll('.card-wrapper');
+  const allFlipped = [...wrappers].every(w => w.classList.contains('flipped'));
+  wrappers.forEach(w => w.classList.toggle('flipped', !allFlipped));
+  updateProgress();
+});
+
+document.addEventListener('keydown', e => {
+  if (viewMode !== 'single') return;
+  const len = activeCards.length;
+  if (e.key === 'ArrowLeft') { currentIndex = (currentIndex - 1 + len) % len; renderCards(); }
+  if (e.key === 'ArrowRight') { currentIndex = (currentIndex + 1) % len; renderCards(); }
+  if (e.key === ' ') { e.preventDefault(); document.querySelector('.card-wrapper')?.classList.toggle('flipped'); updateProgress(); }
+});
+
+// Tab filtering (combined page only)
+document.querySelectorAll('[data-chapter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-chapter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const ch = btn.dataset.chapter;
+    activeCards = ch === 'all' ? ALL_CARDS : ALL_CARDS.filter(c => c.chapter === ch);
+    currentIndex = 0;
+    renderCards();
+  });
+});
+
+// Restore theme
+if (localStorage.getItem('flashcard-theme') === 'dark') {
+  document.documentElement.dataset.theme = 'dark';
+  document.querySelector('[data-action="theme"]').textContent = 'Light Mode';
+}
+
+renderCards();
+</script>
+</body>
+</html>

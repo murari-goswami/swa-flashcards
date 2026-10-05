@@ -1,0 +1,791 @@
+{
+  "generated": "2026-10-05T18:00:00Z",
+  "chapters": [
+    {
+      "slug": "blue-architecture",
+      "title": "BLUE - Architecture",
+      "short": "Architecture",
+      "color": "#2196F3",
+      "tag": "SWA::Blue-Architecture",
+      "cards": [
+        {
+          "num": 1,
+          "title": "Goals-Principles-Decisions (GPD) Model",
+          "prompt": "What is the GPD chain and how does it connect requirements to implementation?",
+          "points": [
+            "<strong>GPD</strong> cascades: Requirement → Goal → Principle → Decision",
+            "<strong>Goals</strong>: what to achieve (consistency, usability, reusability)",
+            "<strong>Principles</strong>: general rules and boundaries derived from goals",
+            "<strong>Decisions</strong>: specific implementation steps fulfilling a principle",
+            "Ensures <strong>traceability</strong> — decisions traced back through principle to goal",
+            "Challenges discussed <strong>at the principle level</strong>, decisions re-opened without touching goals",
+            "<strong>Freedom of Choice</strong>: decisions can change while goals and principles remain stable"
+          ]
+        },
+        {
+          "num": 2,
+          "title": "Architecture Decision Records (ADR)",
+          "prompt": "What are ADRs, their templates, and how do they prevent architectural amnesia?",
+          "points": [
+            "<strong>5 intro questions</strong>: What, How, Where, How much, Difficulties",
+            "<strong>Nygard (2011)</strong> format: Title, Context, Decision, Status, Consequences",
+            "<strong>MADR</strong> adds Considered Options, Pros/Cons, and <strong>Decision Drivers</strong>",
+            "<strong>Decision Drivers</strong> are the <strong>hinge</strong> — turn opinion into traceable evaluation",
+            "Statuses: <strong>Proposed, Accepted, Rejected, Deprecated, Superseded</strong>",
+            "SWA duties: document decisions, ensure consistency, regular review, define process",
+            "<strong>Docs-as-Code</strong>: ADRs in repo, PR = review, merge = approval",
+            "<strong>Fitness Functions</strong>: validate code against ADRs, report violations automatically"
+          ]
+        },
+        {
+          "num": 3,
+          "title": "Architecture Documentation",
+          "prompt": "How do we define, view, and document software architecture?",
+          "points": [
+            "<strong>IEEE 1471</strong>: components, relationships, environment, governing principles",
+            "<strong>Booch</strong>: significant decisions measured by <strong>cost of change</strong>",
+            "<strong>Johnson</strong>: architecture is about the important stuff, whatever that is",
+            "<strong>4+1 Views</strong>: Use Case, Logical, Process, Development, Physical (+n extra)",
+            "<strong>C4 Model</strong>: Context (mgmt), Container (architects/DevOps), Component (dev), Code (dev)",
+            "<strong>arc42</strong> template: do not delete any part; risk: incomplete or overloaded",
+            "<strong>Drawing tools</strong> (Visio, PlantUML): lightweight; <strong>Modelling tools</strong> (MagicDraw): consistency",
+            "SWA duties: define needed views, keep views consistent, document decisions, review regularly"
+          ]
+        },
+        {
+          "num": 4,
+          "title": "Systematic Architecture Design",
+          "prompt": "How does the L-Model guide systematic architecture from forces to implementation?",
+          "points": [
+            "Architecture = <strong>Forces + Creativity + Communication + Decisions</strong>",
+            "<strong>Forces</strong> = Requirements (functional + quality) + Constraints (infra + non-technical)",
+            "<strong>ASR</strong> found via <strong>\"5 miles wide, 5 inches deep\"</strong> — shallow scan, then deep dive",
+            "<strong>L-Model</strong>: vertical (elicitation → domain → dynamics → scope) then horizontal (design → deploy → principles → increments)",
+            "Maturity: <strong>Draft → Walking Skeleton → MVP → MMP/MLP</strong>; Skeleton = end-to-end production quality",
+            "<strong>Inverse Conway</strong>: design target architecture first, reshape teams to match",
+            "<strong>Pyramid</strong>: max 3 levels (System → Subsystem → Component) + cross-cutting concerns",
+            "<strong>Strategic</strong> = system-wide decisions; <strong>Tactical</strong> = component-level decisions",
+            "Entire <strong>L-Model traversed every iteration</strong>; empty phases become no-op, never skipped"
+          ]
+        },
+        {
+          "num": 5,
+          "title": "Quality Scenarios and Design Tactics",
+          "prompt": "How do Quality Scenarios drive tactic selection and trade-off management?",
+          "points": [
+            "Quality Scenario has <strong>6 elements</strong>: Source, Stimulus, Artifact, Environment, Response, Response Measure",
+            "<strong>Utility Tree</strong>: Root (utility) → Quality Domains → Refinements → Leaf scenarios",
+            "Each leaf rated on <strong>Business Value</strong> and <strong>Architectural Impact</strong>; <strong>H/H = ASR</strong>",
+            "<strong>Fault Tolerance</strong> tactics: detection (heartbeat), redundancy, rollback, transactions",
+            "<strong>Security</strong> tactics: authenticate/authorize, intrusion detection, audit trail",
+            "<strong>Performance</strong> tactics: manage event rate, concurrency, scheduling policy",
+            "<strong>Modifiability</strong> tactics: semantic coherence, hide information, intermediary, polymorphism",
+            "<strong>Design Tactic</strong> = single building block; <strong>Design Strategy</strong> = overall plan combining tactics",
+            "Trade-off management: improving one quality often degrades another (e.g., security vs performance)"
+          ]
+        },
+        {
+          "num": 6,
+          "title": "Architectural and Design Patterns",
+          "prompt": "How are patterns selected, ordered, and what are their key trade-offs?",
+          "points": [
+            "<strong>Pattern Language</strong> template: problem/context, solution, behavior, consequences (trade-offs)",
+            "<strong>5-step selection</strong>: identify problem → check catalog → analyze benefits → analyze liabilities → pick simplest",
+            "Order: <strong>Quality Scenarios → Tactics → Patterns LAST</strong> (patterns implement tactics)",
+            "<strong>Layered</strong>: separation of concerns; liability = <strong>sinkhole anti-pattern</strong>, lower performance",
+            "<strong>Event-Driven</strong>: extreme decoupling + scalability; liability = <strong>traceability</strong> and debugging difficulty",
+            "<strong>Pipes & Filters</strong>: chainable transforms; liability = <strong>not suitable for UI</strong>, parse/serialize overhead",
+            "<strong>Microservices</strong>: independent deploy + scaling; liability = <strong>distributed transactions</strong>, monitoring complexity",
+            "<strong>Strangler</strong>: gradual monolith migration via facade routing to new services",
+            "<strong>Hexagonal</strong> (Ports & Adapters): uses <strong>Adapter pattern + Dependency Injection</strong>; flexible but more indirection"
+          ]
+        },
+        {
+          "num": 7,
+          "title": "Domain-Driven Design (DDD)",
+          "prompt": "What are the strategic and tactical building blocks of DDD?",
+          "points": [
+            "<strong>Ubiquitous Language</strong>: shared strict language in code, diagrams, speech",
+            "<strong>Bounded Contexts</strong>: models valid only within a specific context boundary",
+            "3 <strong>Subdomains</strong>: <strong>Core</strong> (full DDD), <strong>Supporting</strong> (simple), <strong>Generic</strong> (buy)",
+            "<strong>Context Map</strong> patterns: <strong>Shared Kernel</strong>, <strong>Conformist</strong>, <strong>Anti-corruption Layer (ACL)</strong>",
+            "<strong>Event Storming</strong> colors: orange=Event, blue=Command, yellow=Actor, purple=Policy",
+            "Tactical: <strong>Entity</strong> (identity+lifecycle), <strong>Value Object</strong> (immutable, no identity)",
+            "<strong>Aggregate</strong> (consistency boundary via Root), <strong>Repository</strong>, <strong>Factory</strong>",
+            "<strong>Anemic model</strong> = anti-pattern; <strong>Rich model</strong> encapsulates domain behavior",
+            "<strong>Domain Layer</strong> depends on nothing; Infrastructure implements domain interfaces",
+            "<strong>Conway's Law</strong>: team structure mirrors Bounded Context boundaries"
+          ]
+        },
+        {
+          "num": 8,
+          "title": "Architecture in Agile Environment",
+          "prompt": "How is architecture managed within agile development practices?",
+          "points": [
+            "<strong>Architectural Runway</strong>: architecture leads development by 1-2 sprints ahead",
+            "4 <strong>Enablers</strong>: Exploration, Architectural, Infrastructure, Compliance",
+            "NFR types: <strong>Story-like</strong> (deliver in sprint), <strong>Constraining</strong> (acceptance criteria), <strong>Cross-cutting</strong> (spike+DoD)",
+            "<strong>DoD for Architecture</strong>: done, documented (ADR), communicated, validated (PoC)",
+            "<strong>Architecture Owner</strong>: part-time team representative, codes and communicates",
+            "<strong>Tiger Teams</strong> conquer first; <strong>Travellers</strong> rotate between teams spreading know-how",
+            "<strong>Simplicity before generality</strong>; hard-coded over excessive configuration",
+            "Architecture smells: too much abstraction, futuristic design, paper architecture",
+            "Decide at <strong>last reasonable moment</strong>: max knowledge, no team blocking",
+            "<strong>Spikes</strong>: research tasks where goal is learning, not delivery"
+          ]
+        },
+        {
+          "num": 9,
+          "title": "Architecture Refactoring",
+          "prompt": "How do you manage architectural refactoring and technical debt?",
+          "points": [
+            "<strong>Lehman's 2nd Law</strong>: system complexity grows naturally, causing design erosion",
+            "Smells: <strong>External</strong> (failing builds, slow deploy) vs <strong>Internal</strong> (cyclic deps, duplication)",
+            "4 levels: <strong>Class</strong> (developer/task) → <strong>Component</strong> (team/backlog) → <strong>Subsystem</strong> (epic) → <strong>System</strong> (project/CTO)",
+            "<strong>Reengineering</strong> = reverse + forward engineering; <strong>Rewriting</strong> = discard and rebuild",
+            "<strong>Tech Debt Quadrant</strong>: Deliberate/Inadvertent × Prudent/Reckless (4 quadrants)",
+            "Financial metaphor: <strong>loan</strong> (quick delivery), <strong>interest</strong> (costly maintenance), <strong>repayment</strong> (refactor)",
+            "6 steps: root cause → changes → <strong>Business Case</strong> (ROI) → present → plan → schedule",
+            "<strong>Corridors</strong>: reserved capacity (e.g. 15% per sprint) for maintenance",
+            "<strong>Triggers</strong>: automatic response when metrics exceed limits (e.g. Sonar red)",
+            "Measure debt: static analysis, velocity drops, change density in components"
+          ]
+        },
+        {
+          "num": 10,
+          "title": "Experience — Architecture",
+          "prompt": "What cross-cutting lessons emerge from real-world architecture examples?",
+          "points": [
+            "<strong>Make the invisible visible</strong>: latency diagram, ADR index, dependency cycle",
+            "<strong>Short-term workaround + documented repayment</strong> is prudent, not sloppy",
+            "<strong>Decide against drivers, not opinions</strong>: GPD and MADR enable principled re-opening",
+            "<strong>Bound what grows</strong>: Claim-Check and latency budgets cap scaling dimensions",
+            "<strong>Architecture is a social activity</strong>: PO, PM, domain experts appear everywhere",
+            "Non-technical forces can <strong>defeat technically correct architecture</strong> (adoption, trust)",
+            "Walking Skeleton cheapest risk reducer <strong>before product-market fit</strong>"
+          ]
+        },
+        {
+          "num": 11,
+          "title": "Systematic Architecture Design",
+          "prompt": "How does the L-model drive systematic architecture from forces to implementation?",
+          "points": [
+            "Architecture = <strong>Forces + Creativity + Communication + Decisions</strong>",
+            "<strong>Forces = Requirements + Constraints</strong>; constraints include non-technical ones",
+            "<strong>ASR</strong> identified via <strong>5 miles wide, 5 inches deep</strong> method",
+            "<strong>L-model</strong>: vertical (elicit, domain, dynamics, scope) then horizontal (design to increments)",
+            "Maturity: <strong>Initial Draft → Walking Skeleton → MVP → MMP/MLP</strong>",
+            "<strong>Pyramid model</strong>: max 3 levels (System → Subsystem → Component) + cross-cutting",
+            "<strong>Inverse Conway Maneuver</strong>: design architecture first, then reorganize teams to match"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "gray-requirements",
+      "title": "GRAY - Requirements",
+      "short": "Requirements",
+      "color": "#78909C",
+      "tag": "SWA::Gray-Requirements",
+      "cards": [
+        {
+          "num": 1,
+          "title": "Requirements Engineering General",
+          "prompt": "What are the core activities and principles of Requirements Engineering for a software architect?",
+          "points": [
+            "<strong>RE activities</strong>: elicitation, documentation, validation, management",
+            "<strong>Kano model</strong>: Basic (must-have), Performance (linear), Excitement (delight)",
+            "<strong>Requirements</strong> describe WHAT the system must do, not HOW",
+            "SWA must ensure requirements are <strong>testable and traceable</strong>",
+            "<strong>Stakeholder analysis</strong> identifies who influences requirements",
+            "Requirements evolve; <strong>change management</strong> process is essential"
+          ]
+        },
+        {
+          "num": 2,
+          "title": "Problem vs Solution Space",
+          "prompt": "How do you distinguish the Problem Space from the Solution Space in requirements?",
+          "points": [
+            "<strong>Problem Space</strong>: stakeholder needs, goals, and domain constraints",
+            "<strong>Solution Space</strong>: technical design, architecture, implementation choices",
+            "Mixing spaces leads to <strong>premature design decisions</strong> in requirements",
+            "<strong>Twin Peaks</strong> model: requirements and architecture co-evolve iteratively",
+            "SWA bridges both spaces via <strong>ASR identification</strong> and trade-off analysis",
+            "Domain model belongs to <strong>Problem Space</strong>; deployment model to Solution Space"
+          ]
+        },
+        {
+          "num": 3,
+          "title": "Classification of Requirements",
+          "prompt": "How are requirements classified into functional and non-functional categories?",
+          "points": [
+            "<strong>Functional</strong>: what the system does (features, business rules, data)",
+            "<strong>Non-functional (quality)</strong>: how well the system performs (ISO 25010)",
+            "<strong>Constraints</strong>: mandatory boundaries (technology, legal, organizational)",
+            "<strong>ISO 25010</strong> qualities: reliability, security, maintainability, performance, etc.",
+            "NFRs are <strong>architecturally significant</strong> — they shape design decisions",
+            "Each NFR needs a <strong>measurable quality scenario</strong> for testability"
+          ]
+        },
+        {
+          "num": 4,
+          "title": "SWA Goals in Requirements Engineering",
+          "prompt": "What are the architect's specific goals and responsibilities in RE?",
+          "points": [
+            "Identify <strong>Architecturally Significant Requirements (ASR)</strong> early",
+            "Ensure NFRs are <strong>specific, measurable, and testable</strong> (quality scenarios)",
+            "Challenge requirements that are <strong>contradictory or technically infeasible</strong>",
+            "<strong>Utility Tree</strong> prioritizes ASRs by business value and architectural risk",
+            "SWA participates in <strong>requirements reviews</strong> and validation workshops",
+            "Bridge between <strong>stakeholder needs</strong> and <strong>technical feasibility</strong>"
+          ]
+        },
+        {
+          "num": 5,
+          "title": "Requirement Elicitation",
+          "prompt": "What techniques are used to elicit requirements, and what are their trade-offs?",
+          "points": [
+            "<strong>Interviews</strong>: deep insight but time-intensive and interviewer-biased",
+            "<strong>Workshops</strong> (e.g., JAD): collaborative, fast consensus, but expensive to organize",
+            "<strong>Prototyping</strong>: validates UI/UX early; risk of <strong>anchoring</strong> on prototype",
+            "<strong>Observation</strong> (ethnography): reveals tacit knowledge users cannot articulate",
+            "<strong>Document analysis</strong>: leverages existing specs but may be outdated",
+            "<strong>Questionnaires</strong>: scalable for large groups but low-depth responses",
+            "SWA focuses on eliciting <strong>quality attributes and constraints</strong>"
+          ]
+        },
+        {
+          "num": 6,
+          "title": "Requirement Consolidation",
+          "prompt": "How are elicited requirements consolidated into a coherent, conflict-free set?",
+          "points": [
+            "<strong>Consolidation</strong> merges, deduplicates, and resolves requirement conflicts",
+            "<strong>Conflict types</strong>: contradictions, redundancies, ambiguities, gaps",
+            "<strong>Prioritization</strong> techniques: MoSCoW, Kano, Weighted Scoring, Cost of Delay",
+            "<strong>Negotiation</strong> with stakeholders when trade-offs are unavoidable",
+            "<strong>Traceability matrix</strong> links requirements to sources and tests",
+            "SWA ensures <strong>architectural consistency</strong> across consolidated requirements"
+          ]
+        },
+        {
+          "num": 7,
+          "title": "Requirement Analysis",
+          "prompt": "How does requirement analysis ensure quality, feasibility, and architectural alignment?",
+          "points": [
+            "<strong>Analysis</strong> checks completeness, consistency, feasibility, and testability",
+            "<strong>Impact analysis</strong> evaluates how new requirements affect existing architecture",
+            "<strong>Feasibility study</strong>: technical risk, cost, and timeline assessment",
+            "<strong>Modeling</strong> techniques: use cases, user stories, domain models, state diagrams",
+            "<strong>Acceptance criteria</strong> must be defined for every requirement",
+            "SWA validates that NFRs are <strong>architecturally achievable</strong> with chosen tactics"
+          ]
+        },
+        {
+          "num": 8,
+          "title": "Requirements Pyramid",
+          "prompt": "What is the Requirements Pyramid and how do abstraction levels relate?",
+          "points": [
+            "<strong>Pyramid levels</strong>: Business Goals → Features → Use Cases → User Stories → Tasks",
+            "Each level adds <strong>detail and testability</strong>; higher levels are more stable",
+            "<strong>Epics</strong> decompose into stories; stories into <strong>acceptance criteria</strong>",
+            "<strong>INVEST</strong> criteria for good user stories: Independent, Negotiable, Valuable, Estimable, Small, Testable",
+            "SWA works primarily at <strong>Feature and Use Case</strong> levels for ASR identification",
+            "<strong>Vertical slicing</strong> delivers value across all architecture layers per story"
+          ]
+        },
+        {
+          "num": 9,
+          "title": "Definition of Done vs Definition of Ready",
+          "prompt": "How do DoD and DoR ensure quality gates in agile requirements management?",
+          "points": [
+            "<strong>DoR</strong>: checklist before a story enters a sprint (clear, estimated, testable)",
+            "<strong>DoD</strong>: checklist before a story is considered complete (coded, tested, reviewed)",
+            "DoR prevents <strong>incomplete requirements</strong> from entering development",
+            "DoD ensures <strong>consistent quality</strong> across all delivered increments",
+            "SWA adds architectural criteria: <strong>ADR written, NFRs validated, no new debt</strong>",
+            "Both evolve over time as the team <strong>matures and learns</strong>"
+          ]
+        },
+        {
+          "num": 10,
+          "title": "FURPS+ and Non-Functional Requirements",
+          "prompt": "What is the FURPS+ model and how does it structure non-functional requirements?",
+          "points": [
+            "<strong>FURPS+</strong>: Functionality, Usability, Reliability, Performance, Supportability",
+            "<strong>+</strong> adds: Design, Implementation, Interface, Physical constraints",
+            "Each quality must have <strong>measurable acceptance criteria</strong> (response time < 200ms)",
+            "<strong>Quality scenarios</strong> (SEI format) make NFRs testable and unambiguous",
+            "NFRs drive <strong>architectural decisions</strong> more than functional requirements",
+            "Trade-offs between qualities require <strong>explicit stakeholder agreement</strong>"
+          ]
+        },
+        {
+          "num": 11,
+          "title": "Role of SWA and Quality Attributes",
+          "prompt": "How does the software architect translate quality attributes into architectural decisions?",
+          "points": [
+            "SWA is the <strong>guardian of quality attributes</strong> across the system lifecycle",
+            "<strong>ATAM</strong> evaluates architecture against quality attribute scenarios",
+            "<strong>Sensitivity points</strong>: decisions affecting one quality attribute significantly",
+            "<strong>Trade-off points</strong>: decisions affecting multiple qualities in opposing directions",
+            "<strong>Risks</strong> and <strong>non-risks</strong> documented for stakeholder transparency",
+            "Quality attributes must be <strong>prioritized</strong> — you cannot optimize all equally"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "green-business-understanding",
+      "title": "GREEN - Business Understanding",
+      "short": "Business",
+      "color": "#4CAF50",
+      "tag": "SWA::Green-Business",
+      "cards": [
+        {
+          "num": 1,
+          "title": "Siemens Development System",
+          "prompt": "What is the Siemens Development System and how does it guide software development at Siemens?",
+          "points": [
+            "<strong>SDS</strong> is Siemens' company-wide framework for product development",
+            "Combines <strong>agile methods</strong> with stage-gate governance for enterprise scale",
+            "<strong>Quality Gates</strong> (QG0–QG5) ensure milestone-based decision checkpoints",
+            "Architects must align <strong>architecture milestones</strong> with QG deliverables",
+            "<strong>SWCOE</strong> provides cross-BU standards, tools, and best practices",
+            "SDS balances <strong>local team autonomy</strong> with corporate compliance needs"
+          ]
+        },
+        {
+          "num": 2,
+          "title": "Cynefin Framework",
+          "prompt": "How does the Cynefin framework help architects choose the right approach for a given problem?",
+          "points": [
+            "Five domains: <strong>Clear, Complicated, Complex, Chaotic, Confused</strong>",
+            "<strong>Clear</strong>: best practice, sense-categorize-respond (standard patterns)",
+            "<strong>Complicated</strong>: good practice, sense-analyze-respond (expert analysis)",
+            "<strong>Complex</strong>: emergent practice, probe-sense-respond (experiments, spikes)",
+            "<strong>Chaotic</strong>: novel practice, act-sense-respond (stabilize first)",
+            "Architects use Cynefin to decide between <strong>upfront design vs emergent architecture</strong>"
+          ]
+        },
+        {
+          "num": 3,
+          "title": "Output vs Outcome vs Impact",
+          "prompt": "What is the difference between Output, Outcome, and Impact, and why does it matter for architects?",
+          "points": [
+            "<strong>Output</strong>: what we build (features, components, deliverables)",
+            "<strong>Outcome</strong>: behavior change in users enabled by the output",
+            "<strong>Impact</strong>: business-level result (revenue, market share, cost reduction)",
+            "Teams often optimize for <strong>output</strong> when they should target <strong>outcome</strong>",
+            "<strong>OKRs</strong> connect team objectives to measurable outcome/impact results",
+            "Architects should justify decisions by <strong>expected outcome</strong>, not just technical merit"
+          ]
+        },
+        {
+          "num": 4,
+          "title": "Technical Debt",
+          "prompt": "How should architects manage technical debt from a business perspective?",
+          "points": [
+            "<strong>Cunningham's metaphor</strong>: debt = faster delivery now, interest = future cost",
+            "<strong>Quadrant</strong>: Deliberate/Inadvertent × Prudent/Reckless (4 types)",
+            "<strong>Prudent deliberate</strong>: conscious trade-off with documented repayment plan",
+            "Debt becomes visible through <strong>velocity decline and defect rate increase</strong>",
+            "Architect must <strong>quantify debt in business terms</strong> (cost, risk, timeline impact)",
+            "<strong>Boy Scout Rule</strong>: leave code better than found; incremental payoff"
+          ]
+        },
+        {
+          "num": 5,
+          "title": "Continuous Delivery and DORA Metrics",
+          "prompt": "How do DORA metrics measure software delivery performance, and what enables Continuous Delivery?",
+          "points": [
+            "Four DORA metrics: <strong>Lead Time, Deploy Frequency, MTTR, Change Failure Rate</strong>",
+            "<strong>Elite performers</strong>: multiple deploys/day, <1h lead time, <1h MTTR",
+            "<strong>CD pipeline</strong>: commit → build → test → staging → production (automated)",
+            "Architecture must support <strong>independent deployability</strong> and feature toggles",
+            "<strong>Trunk-based development</strong> with short-lived branches reduces merge conflicts",
+            "DORA proves <strong>speed and stability are not trade-offs</strong> — they reinforce each other"
+          ]
+        },
+        {
+          "num": 6,
+          "title": "Component Teams vs Feature Teams",
+          "prompt": "What are the trade-offs between component teams and feature teams?",
+          "points": [
+            "<strong>Component teams</strong>: own a technical layer (DB, API, UI); deep expertise",
+            "<strong>Feature teams</strong>: own end-to-end delivery of a user-facing feature",
+            "Component teams create <strong>handoff bottlenecks</strong> and cross-team dependencies",
+            "Feature teams need <strong>broad skills</strong> but deliver value faster with less coordination",
+            "<strong>Conway's Law</strong>: architecture mirrors team structure; choose teams intentionally",
+            "Hybrid approach: feature teams with <strong>enabling teams</strong> for specialized expertise"
+          ]
+        },
+        {
+          "num": 7,
+          "title": "Host Leadership",
+          "prompt": "What is Host Leadership and how does it apply to software architects?",
+          "points": [
+            "<strong>Host metaphor</strong>: leader as host of a party, not commander of troops",
+            "Four positions: <strong>In the Spotlight, With the Guests, In the Gallery, In the Kitchen</strong>",
+            "<strong>Spotlight</strong>: set direction and vision; <strong>Gallery</strong>: observe and reflect",
+            "<strong>With Guests</strong>: collaborate as equal; <strong>Kitchen</strong>: prepare behind scenes",
+            "Architects shift between <strong>leading and stepping back</strong> depending on context",
+            "Effective architects <strong>create space</strong> for teams to make decisions autonomously"
+          ]
+        },
+        {
+          "num": 8,
+          "title": "Open Source Software at Siemens",
+          "prompt": "What are the key considerations for using and contributing to OSS at Siemens?",
+          "points": [
+            "<strong>License compliance</strong>: permissive (MIT, Apache) vs copyleft (GPL, AGPL)",
+            "<strong>AGPL</strong> requires source disclosure for network use — high risk for products",
+            "Siemens uses <strong>OSS scanning tools</strong> to detect license and vulnerability issues",
+            "<strong>Inner Source</strong>: applying OSS collaboration patterns within the company",
+            "Architects must evaluate <strong>community health, maintenance, and security</strong> of OSS",
+            "<strong>SBOM</strong> (Software Bill of Materials) tracks all OSS components in products"
+          ]
+        },
+        {
+          "num": 9,
+          "title": "97 Things Every SWA Should Know",
+          "prompt": "What are the key recurring themes from '97 Things Every Software Architect Should Know'?",
+          "points": [
+            "<strong>Simplicity</strong>: prefer the simplest solution that could possibly work",
+            "<strong>Communication</strong> is more important than technical skill for architects",
+            "<strong>There is no one-size-fits-all</strong> solution; context drives every decision",
+            "<strong>Continuously learn</strong>: architects must stay hands-on and current",
+            "<strong>Stand behind decisions</strong> and own consequences; avoid ivory tower",
+            "Architecture is about <strong>trade-offs</strong>, not finding the perfect answer"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "red-test-and-quality",
+      "title": "RED - Test & Quality",
+      "short": "Test & Quality",
+      "color": "#F44336",
+      "tag": "SWA::Red-Test",
+      "cards": [
+        {
+          "num": 1,
+          "title": "Value of Testing, Test Exit Criteria",
+          "prompt": "What determines when testing should stop, and how does the Cost of Quality model guide testing investment?",
+          "points": [
+            "<strong>Cost of Quality</strong> = prevention + appraisal + failure costs",
+            "Sweet spot: marginal cost of next bug exceeds <strong>expected loss</strong>",
+            "<strong>Test exit criteria</strong> define conditions to end a testing phase",
+            "Testing provides <strong>information</strong> about quality, not quality itself",
+            "<strong>Residual risk</strong> remains after testing; must be communicated to stakeholders",
+            "<strong>Absence-of-errors fallacy</strong>: bug-free software can still fail users"
+          ]
+        },
+        {
+          "num": 2,
+          "title": "Software Testing and Quality",
+          "prompt": "How do QA, QC, and Testing differ, and what are the seven principles of software testing?",
+          "points": [
+            "<strong>QA</strong> = process-focused prevention; <strong>QC</strong> = product conformity checks",
+            "<strong>Verification</strong> (building product right) vs <strong>Validation</strong> (building right product)",
+            "Seven principles include <strong>defect clustering</strong> and <strong>pesticide paradox</strong>",
+            "<strong>Exhaustive testing</strong> is impossible; use risk-based prioritization",
+            "<strong>Design for Testability</strong> uses DI and Humble Object patterns",
+            "<strong>Test strategy</strong> is static/high-level; <strong>test plan</strong> is project-specific",
+            "Testability is a key <strong>non-functional requirement</strong> for architecture"
+          ]
+        },
+        {
+          "num": 3,
+          "title": "Test Levels, Test Pyramid",
+          "prompt": "What are the four test levels, and how do the Testing Pyramid and Testing Trophy differ in strategy?",
+          "points": [
+            "Four levels: <strong>Unit, Integration, System, Acceptance</strong> testing",
+            "<strong>Testing Pyramid</strong> (Cohn): broad unit base, narrow E2E top",
+            "<strong>Testing Trophy</strong> (Dodds): emphasizes integration + static analysis",
+            "<strong>Ice Cream Cone</strong> anti-pattern inverts pyramid with excessive E2E",
+            "<strong>Shift-left</strong> finds defects early at lowest, cheapest test level",
+            "Architecture must support <strong>isolation and DI</strong> to fill pyramid base"
+          ]
+        },
+        {
+          "num": 4,
+          "title": "Unit Testing",
+          "prompt": "What defines a good unit test, and how do test doubles, coverage metrics, and TDD support unit-level verification?",
+          "points": [
+            "<strong>SUT/CUT</strong>: smallest independently testable code element in isolation",
+            "Test doubles: <strong>Stub, Mock, Spy, Fake, Dummy</strong> replace dependencies",
+            "Structural coverage: <strong>Statement, Branch, MC/DC</strong> (ASIL D requires MC/DC)",
+            "<strong>TDD Red-Green-Refactor</strong> drives design and ensures early coverage",
+            "<strong>Over-mocking</strong> couples tests to implementation, breaking on refactor",
+            "<strong>Host vs Target</strong>: fast CI feedback vs real compiler/HW fidelity",
+            "<strong>Humble Object</strong> separates testable logic from untestable environment"
+          ]
+        },
+        {
+          "num": 5,
+          "title": "Integration Testing",
+          "prompt": "What integration strategies exist, and how does integration testing verify component interactions?",
+          "points": [
+            "Strategies: <strong>Top-Down, Bottom-Up, Sandwich, Big-Bang</strong> integration",
+            "<strong>Test Driver</strong> calls SUT from above; <strong>Test Stub</strong> replaces below",
+            "<strong>HSI testing</strong> verifies hardware-software interface correctness",
+            "<strong>Contract Testing / CDC</strong> validates interface compatibility independently",
+            "Resource allocation testing checks <strong>RAM, ROM, Stack, CPU</strong> usage",
+            "<strong>Fault injection</strong> verifies error handling and recovery mechanisms",
+            "<strong>Bidirectional traceability</strong> (SRTM) links requirements to test cases"
+          ]
+        },
+        {
+          "num": 6,
+          "title": "Contract Testing",
+          "prompt": "How do Consumer-Driven Contracts prevent integration failures in distributed systems?",
+          "points": [
+            "<strong>CDC</strong>: consumer defines expected provider behavior in a contract",
+            "<strong>Pact framework</strong> generates pact files from consumer test expectations",
+            "<strong>Mock drift</strong> problem: local mocks diverge from real provider behavior",
+            "<strong>Provider States</strong> set up required preconditions for contract verification",
+            "<strong>Pact Broker</strong> shares and versions contracts across CI/CD pipelines",
+            "Contracts verify <strong>interface compatibility</strong>, not business logic",
+            "Enables <strong>independent deployability</strong> of services without full E2E tests"
+          ]
+        },
+        {
+          "num": 7,
+          "title": "Systematic Test Design",
+          "prompt": "What is the systematic test design process, and how do black-box and white-box techniques complement each other?",
+          "points": [
+            "<strong>Test basis</strong>: requirements, architecture, specs drive test derivation",
+            "Black-box: <strong>Equivalence Partitioning, BVA, State-based</strong> testing",
+            "White-box: <strong>Statement, Branch, Path</strong> coverage of code structure",
+            "<strong>Test oracle</strong> defines expected results for pass/fail evaluation",
+            "<strong>SRTM</strong> traces requirements to test cases bidirectionally",
+            "STD is a <strong>process/methodology</strong>; TDT are architectural design patterns"
+          ]
+        },
+        {
+          "num": 8,
+          "title": "Test Design Tactics",
+          "prompt": "How do Test Design Tactics translate a test strategy into specific, measurable test cases?",
+          "points": [
+            "<strong>TDT</strong> reduce infinite input space to optimal finite test scenarios",
+            "<strong>EP</strong> divides domain into valid/invalid equivalence classes",
+            "<strong>BVA</strong> tests boundary values B, B-delta, B+delta for off-by-one errors",
+            "<strong>Decision tables</strong> expose missing or contradictory requirement rules",
+            "<strong>State transition</strong> testing: 0-switch (states) vs 1-switch (sequences)",
+            "<strong>MC/DC</strong> required for safety-critical code (ASIL D / ISO 26262)",
+            "Architecture needs <strong>controllability and observability</strong> to apply TDT"
+          ]
+        },
+        {
+          "num": 9,
+          "title": "Test-Driven Development (TDD)",
+          "prompt": "Why is TDD considered a design technique rather than just a testing method?",
+          "points": [
+            "<strong>Red-Green-Refactor</strong>: fail test, minimal code, clean up duplication",
+            "TDD is primarily <strong>analysis and design</strong> (Test-Driven Design), not just QA",
+            "Enforces <strong>SOLID principles</strong>, DI, low coupling, and high cohesion",
+            "<strong>Sociable</strong> (Detroit) tests real collaborators; <strong>Solitary</strong> (London) mocks all",
+            "Tests serve as <strong>living executable documentation</strong> of API behavior",
+            "TDD alone cannot cover <strong>NFRs</strong>: performance, concurrency, safety"
+          ]
+        },
+        {
+          "num": 10,
+          "title": "Behavior Driven Development (BDD)",
+          "prompt": "How does BDD bridge the communication gap between business and technical teams through executable specifications?",
+          "points": [
+            "Uses <strong>Gherkin</strong> format: Given (context), When (action), Then (result)",
+            "<strong>Three Amigos</strong>: BA + Developer + Tester align on examples before coding",
+            "<strong>Outside-In</strong> development drives architecture from acceptance criteria inward",
+            "<strong>Living Documentation</strong> auto-generated from CI test execution results",
+            "<strong>Declarative</strong> scenarios describe business intent, not UI click steps",
+            "Requires <strong>layered/hexagonal architecture</strong> to isolate tests from infrastructure"
+          ]
+        },
+        {
+          "num": 11,
+          "title": "Risk Based Testing",
+          "prompt": "How does Risk-Based Testing prioritize testing effort using risk assessment?",
+          "points": [
+            "Risk = <strong>Likelihood x Impact</strong>; prioritizes where failure hurts most",
+            "<strong>Product risk</strong> (quality) is mitigable by testing; <strong>project risk</strong> is not",
+            "<strong>RPN</strong> (Risk Priority Number) ranks risks by probability, impact, detectability",
+            "<strong>FMEA</strong> for safety-critical; <strong>PRAM</strong> for lightweight risk analysis",
+            "<strong>Depth-first</strong> targets high-risk items; <strong>Breadth-first</strong> covers all areas",
+            "Risk register must be <strong>continuously updated</strong>, not frozen after kick-off",
+            "<strong>3 Amigos</strong> bring business, dev, and QA perspectives to risk assessment"
+          ]
+        },
+        {
+          "num": 12,
+          "title": "Testing Non-Functional Requirements (NFR Testing)",
+          "prompt": "How are quality attributes specified, measured, and tested across architecture and test levels?",
+          "points": [
+            "NFR testing verifies <strong>how well</strong> a system performs, not what it does",
+            "<strong>Quality Attribute Scenario</strong>: 6-part format with measurable response metric",
+            "<strong>Utility Tree</strong> prioritizes NFRs by business value and architectural risk",
+            "<strong>FURPS+</strong> model: Functionality, Usability, Reliability, Performance, Supportability",
+            "<strong>Fault Injection</strong> deliberately introduces faults to verify safety mechanisms",
+            "Quality cannot be <strong>tested in</strong>; testing only verifies architectural decisions",
+            "<strong>Shift-left NFR</strong>: test reliability and performance early, not only at end"
+          ]
+        },
+        {
+          "num": 13,
+          "title": "Design for Testability",
+          "prompt": "What architectural tactics make software testable, and what are the key trade-offs?",
+          "points": [
+            "Two pillars: <strong>Controllability</strong> (set inputs/states) and <strong>Observability</strong> (monitor outputs)",
+            "<strong>Humble Object</strong> extracts testable logic from untestable framework code",
+            "<strong>Dependency Injection</strong> enables test doubles and component isolation",
+            "<strong>Front-door</strong> tests public API; <strong>back-door</strong> uses testability interfaces",
+            "Trade-offs: testability vs <strong>encapsulation, performance, and security</strong>",
+            "James Bach's 5 dimensions: intrinsic, epistemic, project, subjective, value",
+            "DFT can save up to <strong>10% of total project budget</strong> through early defect detection"
+          ]
+        },
+        {
+          "num": 14,
+          "title": "Internal Software Quality",
+          "prompt": "How does internal software quality relate to testability, and what are the three levels of code quality?",
+          "points": [
+            "<strong>Internal quality</strong> = static code/architecture properties (ISO 9126/25010)",
+            "Three levels: <strong>Micro</strong> (lines), <strong>Macro</strong> (classes/SOLID), <strong>Architecture</strong> (layers/cycles)",
+            "<strong>Quality Management Chain</strong>: Process -> Internal -> External -> Quality-in-Use",
+            "<strong>CQM</strong>: static analysis, coding guidelines, metrics, peer reviews",
+            "<strong>Defect Gap Analysis</strong> tracks phase gap between error introduction and detection",
+            "Quality cannot be <strong>tested in</strong>; development and architecture create quality",
+            "Architect acts as <strong>protector of internal quality</strong> across all three levels"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "yellow-social-skills",
+      "title": "YELLOW - Social Skills",
+      "short": "Social Skills",
+      "color": "#F9A825",
+      "tag": "SWA::Yellow-Social",
+      "cards": [
+        {
+          "num": 1,
+          "title": "4C Learning Concept",
+          "prompt": "What is the 4C learning model and how does it structure effective training sessions?",
+          "points": [
+            "Four phases: <strong>Connect, Concept, Concrete Practice, Conclusion</strong>",
+            "<strong>Connect</strong>: activate prior knowledge and link to learner's experience",
+            "<strong>Concept</strong>: present new content in digestible, structured chunks",
+            "<strong>Concrete Practice</strong>: hands-on exercises to apply and internalize knowledge",
+            "<strong>Conclusion</strong>: summarize, reflect, and plan transfer to real work",
+            "Architect uses 4C to <strong>teach architecture decisions</strong> to dev teams",
+            "Active learning > passive lectures; <strong>70-20-10</strong> model supports this"
+          ]
+        },
+        {
+          "num": 2,
+          "title": "Communication",
+          "prompt": "Why is communication the architect's most critical skill, and what models guide effective communication?",
+          "points": [
+            "<strong>Schulz von Thun</strong>: every message has 4 sides (fact, self-reveal, relationship, appeal)",
+            "<strong>Active listening</strong>: paraphrase, ask open questions, withhold judgment",
+            "<strong>Nonviolent Communication</strong> (Rosenberg): observation, feeling, need, request",
+            "Architects spend <strong>~70% of time communicating</strong>, not coding",
+            "<strong>Adapt communication style</strong> to audience (C-level vs developers vs testers)",
+            "Miscommunication is the <strong>#1 cause</strong> of architectural misalignment"
+          ]
+        },
+        {
+          "num": 3,
+          "title": "Peer Feedback (PEW Method)",
+          "prompt": "How does the PEW method structure constructive peer feedback?",
+          "points": [
+            "<strong>PEW</strong>: Perception, Effect, Wish — structured feedback framework",
+            "<strong>Perception</strong>: describe observable behavior without interpretation",
+            "<strong>Effect</strong>: explain the impact of the behavior on you or the team",
+            "<strong>Wish</strong>: state a concrete, actionable change request",
+            "Feedback should be <strong>timely, specific, and behavior-focused</strong> (not personal)",
+            "Receiving: <strong>listen, ask clarifying questions</strong>, don't defend immediately"
+          ]
+        },
+        {
+          "num": 4,
+          "title": "Leadership Without Formal Power",
+          "prompt": "How can architects lead effectively without formal authority over teams?",
+          "points": [
+            "Architects often have <strong>influence but no direct authority</strong> over dev teams",
+            "<strong>Expert power</strong>: credibility through technical competence and hands-on work",
+            "<strong>Referent power</strong>: trust built through relationships and consistent behavior",
+            "<strong>Servant leadership</strong>: remove obstacles, enable teams, share credit",
+            "Use <strong>persuasion over prescription</strong>: explain WHY behind architecture decisions",
+            "<strong>Build coalitions</strong>: align with tech leads, POs, and key developers first"
+          ]
+        },
+        {
+          "num": 5,
+          "title": "Motivation",
+          "prompt": "What motivational theories help architects understand and influence team behavior?",
+          "points": [
+            "<strong>Intrinsic motivation</strong> (autonomy, mastery, purpose) outperforms extrinsic rewards",
+            "<strong>Pink's Drive</strong>: Autonomy, Mastery, Purpose as three pillars of motivation",
+            "<strong>Herzberg</strong>: hygiene factors prevent dissatisfaction; motivators create satisfaction",
+            "<strong>Self-Determination Theory</strong>: competence, autonomy, relatedness are universal needs",
+            "Architects foster motivation by <strong>giving teams ownership</strong> of design decisions",
+            "Avoid <strong>micromanagement</strong> — it destroys autonomy and intrinsic motivation"
+          ]
+        },
+        {
+          "num": 6,
+          "title": "Stakeholder Presentation",
+          "prompt": "How should architects present architecture decisions to different stakeholder groups?",
+          "points": [
+            "<strong>Know your audience</strong>: C-level wants business impact; devs want technical detail",
+            "<strong>Pyramid Principle</strong> (Minto): lead with conclusion, then supporting arguments",
+            "Use <strong>visual aids</strong>: C4 diagrams, architecture decision matrices, trade-off tables",
+            "<strong>Storytelling</strong>: frame decisions as solutions to stakeholder problems",
+            "Address <strong>risks and trade-offs</strong> proactively — don't wait to be asked",
+            "Keep presentations <strong>short and focused</strong>; detailed backup in appendix"
+          ]
+        },
+        {
+          "num": 7,
+          "title": "Change Management and Fearless Change",
+          "prompt": "How does the Fearless Change pattern language help architects drive organizational adoption?",
+          "points": [
+            "<strong>Fearless Change</strong> (Rising/Manns): 48 patterns for introducing new ideas",
+            "<strong>Evangelist</strong>: passionate advocate who persistently promotes the change",
+            "<strong>Small Successes</strong>: demonstrate quick wins to build momentum and credibility",
+            "<strong>Ask for Help</strong>: involve skeptics early to convert resistance into ownership",
+            "<strong>Dedicated Champion</strong>: senior ally who provides political cover and resources",
+            "Change is <strong>emotional, not just rational</strong>; address feelings alongside facts"
+          ]
+        },
+        {
+          "num": 8,
+          "title": "Coaching and Sparring",
+          "prompt": "How do coaching and sparring sessions support architect development and team growth?",
+          "points": [
+            "<strong>Coaching</strong>: guide through questions, don't give answers directly",
+            "<strong>Sparring</strong>: peer-level challenge of ideas to stress-test architecture decisions",
+            "<strong>GROW model</strong>: Goal, Reality, Options, Will — structured coaching conversations",
+            "Architects need <strong>both coaching (receive) and mentoring (give)</strong> roles",
+            "<strong>Socratic questioning</strong> helps teams discover solutions independently",
+            "Regular sparring prevents <strong>confirmation bias</strong> in architecture decisions"
+          ]
+        },
+        {
+          "num": 9,
+          "title": "Self-Leadership and the Responsibility Process",
+          "prompt": "How does the Responsibility Process help architects move from blame to ownership?",
+          "points": [
+            "<strong>Responsibility Process</strong> (Avery): Denial → Blame → Justify → Shame → Obligation → Responsibility",
+            "Only at <strong>Responsibility</strong> level do you have full power to act and change",
+            "<strong>Quit</strong> is an escape at any stage — choosing to disengage from the problem",
+            "Self-leadership requires <strong>awareness</strong> of which stage you're currently in",
+            "Architects model <strong>ownership culture</strong> by taking responsibility for failures",
+            "<strong>Intention + Awareness + Confront</strong> are the three keys to reaching Responsibility"
+          ]
+        }
+      ]
+    }
+  ]
+}

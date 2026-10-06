@@ -491,6 +491,23 @@
             "<strong>Stand behind decisions</strong> and own consequences; avoid ivory tower",
             "Architecture is about <strong>trade-offs</strong>, not finding the perfect answer"
           ]
+        },
+        {
+          "num": 10,
+          "title": "Roles of PO, SM and TL within Business Understanding",
+          "prompt": "How do Product Owner, Scrum Master and Technical Lead complement each other around customer value?",
+          "points": [
+            "<strong>PO</strong> = <strong>WHAT + WHY</strong>: customer value, backlog, priorities, acceptance criteria",
+            "<strong>TL / Team Architect</strong> = <strong>HOW + consequences</strong>: options, quality attributes, risks, technical debt",
+            "<strong>SM</strong> = <strong>HOW WE WORK</strong>: flow, impediments, transparency, continuous improvement",
+            "Complementary responsibilities around customer value — <strong>not a hierarchy</strong>; architect maps <strong>problem space → solution space</strong>",
+            "Every decision is a <strong>trade-off</strong> of value, cost, risk, quality and time",
+            "Anti-patterns: PO dictates the solution, architect becomes a <strong>bottleneck</strong>, SM acts as project manager",
+            "<strong>Safety-related I/O scenario</strong>: options = fast local change / targeted refactoring / limited MVP",
+            "Never use a bare <strong>technical veto</strong> — present options with deadline, risk, test scope and long-term cost",
+            "Fast option acceptable only with <strong>ADR, evaluated debt, backlog item and payback strategy</strong>",
+            "Test strategy beyond acceptance: integration, system, <strong>fault-injection</strong> and regression tests"
+          ]
         }
       ]
     },

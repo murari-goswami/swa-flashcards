@@ -1,6 +1,6 @@
 # GREEN - Business Understanding — Flashcards
 
-> 9 flashcards for the SWA Business topics.
+> 10 flashcards for the SWA Business topics.
 > Each card: **Front** (topic + prompt) → **Back** (key points to recall).
 
 ---
@@ -119,5 +119,22 @@
 - **Continuously learn**: architects must stay hands-on and current
 - **Stand behind decisions** and own consequences; avoid ivory tower
 - Architecture is about **trade-offs**, not finding the perfect answer
+
+---
+
+## 10. Roles of PO, SM and TL within Business Understanding
+
+**How do Product Owner, Scrum Master and Technical Lead complement each other around customer value?**
+
+- **PO** = **WHAT + WHY**: customer value, backlog, priorities, acceptance criteria
+- **TL / Team Architect** = **HOW + consequences**: options, quality attributes, risks, technical debt
+- **SM** = **HOW WE WORK**: flow, impediments, transparency, continuous improvement
+- Complementary responsibilities around customer value — **not a hierarchy**; architect maps **problem space → solution space**
+- Every decision is a **trade-off** of value, cost, risk, quality and time
+- Anti-patterns: PO dictates the solution, architect becomes a **bottleneck**, SM acts as project manager
+- **Safety-related I/O scenario**: options = fast local change / targeted refactoring / limited MVP
+- Never use a bare **technical veto** — present options with deadline, risk, test scope and long-term cost
+- Fast option acceptable only with **ADR, evaluated debt, backlog item and payback strategy**
+- Test strategy beyond acceptance: integration, system, **fault-injection** and regression tests
 
 ---

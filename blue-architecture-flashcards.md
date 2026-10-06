@@ -185,11 +185,10 @@
 - **Drift** = decisions architecture does not contain; **Erosion** = decisions violating it
 - **Quantitative**: Code Quality Assessment (**architecture conformance**), Simulation, Prototyping
 - **Prototypes**: Throw-away / Incremental (full production quality) / Evolutionary — decide up front
-- **Qualitative**: **ADR** (challenges, 2 days), **Industry Practice** (4 weeks, concrete measures), **ATAM** (workshop, 2 weeks)
+- **Qualitative**: **ADR** (challenges, 2 days), **Industry Practice** (4 weeks, concrete measures), **ATAM** (workshop, 2 weeks, **no measures**) — complementary
 - **ATAM chain**: Sensitivity Point (cell) → Tradeoff (column) → Risk/Non-Risk (row) → **Risk Themes**
 - Risk/Non-Risk only definable **relative to quality prioritization** — no priorities, no risk
 - **ATAM Matrix**: rows = scenarios by decreasing importance, columns = decisions + constraints, cells need **rationale**; **"?"** = assignment for prototype
-- **ATAM proposes no measures**, Industry Practice does — they are complementary
 - **Paper tiger** smell: approving documents and empty interfaces gives false confidence
 
 ---

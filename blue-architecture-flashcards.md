@@ -1,6 +1,6 @@
 # BLUE - Architecture — Flashcards
 
-> 11 flashcards for the SWA Architecture topics.
+> 13 flashcards for the SWA Architecture topics.
 > Each card: **Front** (topic + prompt) → **Back** (key points to recall).
 
 ---
@@ -173,5 +173,40 @@
 - Maturity: **Initial Draft → Walking Skeleton → MVP → MMP/MLP**
 - **Pyramid model**: max 3 levels (System → Subsystem → Component) + cross-cutting
 - **Inverse Conway Maneuver**: design architecture first, then reorganize teams to match
+
+---
+
+## 12. Architecture Quality &amp; Architecture Review
+
+**How is architecture quality verified, and what do ATAM, ADR and Industry Practice deliver?**
+
+- Quality cannot be declared, it must be **verified**; review = **static verification of architecture**
+- **5 characteristics**: Clean, Simple, Flexible, Evolvable, Agile (bbv cheat sheet)
+- **Drift** = decisions architecture does not contain; **Erosion** = decisions violating it
+- **Quantitative**: Code Quality Assessment (**architecture conformance**), Simulation, Prototyping
+- **Prototypes**: Throw-away / Incremental (full production quality) / Evolutionary — decide up front
+- **Qualitative**: **ADR** (challenges, 2 days), **Industry Practice** (4 weeks, concrete measures), **ATAM** (workshop, 2 weeks)
+- **ATAM chain**: Sensitivity Point (cell) → Tradeoff (column) → Risk/Non-Risk (row) → **Risk Themes**
+- Risk/Non-Risk only definable **relative to quality prioritization** — no priorities, no risk
+- **ATAM Matrix**: rows = scenarios by decreasing importance, columns = decisions + constraints, cells need **rationale**; **"?"** = assignment for prototype
+- **ATAM proposes no measures**, Industry Practice does — they are complementary
+- **Paper tiger** smell: approving documents and empty interfaces gives false confidence
+
+---
+
+## 13. Role of the Siemens SWA
+
+**What is the Siemens Software Architect responsible for, and where are the boundaries of the role?**
+
+- Responsible for the **effective technical solution**, not just a diagram or document
+- **5 duties**: clarify requirements, assess alternatives, drive realization, keep shared understanding, verify quality
+- Leads **technically without disciplinary authority** — decisions must be understandable and justified
+- Competences: technical/methodical, domain/product, requirements &amp; quality, communication, business thinking
+- Communication partners: PO/PM, requirements engineer, developers &amp; integrators, **testers/test architect**, operations &amp; service
+- **Testability** = **controllability** (trigger the situation) + **observability** (see the reaction)
+- Architectural risks drive **risk-based testing**; integration and NFR tests validate the architecture
+- **Classical architect** (broad mandate, coherence) vs **part-time architecture owner** (close to code, bottleneck risk)
+- Part-time model works only with bounded scope, dedicated capacity, clear rights and escalation
+- Anti-patterns: decision without alternatives, vague quality requirement, "automated = testable", deciding in isolation
 
 ---

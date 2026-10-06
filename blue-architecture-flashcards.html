@@ -143,7 +143,7 @@
 <body>
 <div class="header">
   <h1>Architecture — Flashcards</h1>
-  <p>11 cards for SWA exam revision. Click a card to flip it.</p>
+  <p>13 cards for SWA exam revision. Click a card to flip it.</p>
 </div>
 
 
@@ -330,6 +330,41 @@ const ALL_CARDS = [
       "Maturity: <strong>Initial Draft → Walking Skeleton → MVP → MMP/MLP</strong>",
       "<strong>Pyramid model</strong>: max 3 levels (System → Subsystem → Component) + cross-cutting",
       "<strong>Inverse Conway Maneuver</strong>: design architecture first, then reorganize teams to match"
+    ]
+  },
+  {
+    "num": 12,
+    "title": "Architecture Quality &amp; Architecture Review",
+    "prompt": "How is architecture quality verified, and what do ATAM, ADR and Industry Practice deliver?",
+    "points": [
+      "Quality cannot be declared, it must be <strong>verified</strong>; review = <strong>static verification of architecture</strong>",
+      "<strong>5 characteristics</strong>: Clean, Simple, Flexible, Evolvable, Agile (bbv cheat sheet)",
+      "<strong>Drift</strong> = decisions architecture does not contain; <strong>Erosion</strong> = decisions violating it",
+      "<strong>Quantitative</strong>: Code Quality Assessment (<strong>architecture conformance</strong>), Simulation, Prototyping",
+      "<strong>Prototypes</strong>: Throw-away / Incremental (full production quality) / Evolutionary — decide up front",
+      "<strong>Qualitative</strong>: <strong>ADR</strong> (challenges, 2 days), <strong>Industry Practice</strong> (4 weeks, concrete measures), <strong>ATAM</strong> (workshop, 2 weeks)",
+      "<strong>ATAM chain</strong>: Sensitivity Point (cell) → Tradeoff (column) → Risk/Non-Risk (row) → <strong>Risk Themes</strong>",
+      "Risk/Non-Risk only definable <strong>relative to quality prioritization</strong> — no priorities, no risk",
+      "<strong>ATAM Matrix</strong>: rows = scenarios by decreasing importance, columns = decisions + constraints, cells need <strong>rationale</strong>; <strong>\"?\"</strong> = assignment for prototype",
+      "<strong>ATAM proposes no measures</strong>, Industry Practice does — they are complementary",
+      "<strong>Paper tiger</strong> smell: approving documents and empty interfaces gives false confidence"
+    ]
+  },
+  {
+    "num": 13,
+    "title": "Role of the Siemens SWA",
+    "prompt": "What is the Siemens Software Architect responsible for, and where are the boundaries of the role?",
+    "points": [
+      "Responsible for the <strong>effective technical solution</strong>, not just a diagram or document",
+      "<strong>5 duties</strong>: clarify requirements, assess alternatives, drive realization, keep shared understanding, verify quality",
+      "Leads <strong>technically without disciplinary authority</strong> — decisions must be understandable and justified",
+      "Competences: technical/methodical, domain/product, requirements &amp; quality, communication, business thinking",
+      "Communication partners: PO/PM, requirements engineer, developers &amp; integrators, <strong>testers/test architect</strong>, operations &amp; service",
+      "<strong>Testability</strong> = <strong>controllability</strong> (trigger the situation) + <strong>observability</strong> (see the reaction)",
+      "Architectural risks drive <strong>risk-based testing</strong>; integration and NFR tests validate the architecture",
+      "<strong>Classical architect</strong> (broad mandate, coherence) vs <strong>part-time architecture owner</strong> (close to code, bottleneck risk)",
+      "Part-time model works only with bounded scope, dedicated capacity, clear rights and escalation",
+      "Anti-patterns: decision without alternatives, vague quality requirement, \"automated = testable\", deciding in isolation"
     ]
   }
 ];

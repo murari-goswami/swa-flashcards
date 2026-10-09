@@ -337,16 +337,16 @@ const ALL_CARDS = [
   },
   {
     "num": 11,
-    "title": "Systematic Architecture Design",
-    "prompt": "How does the L-model drive systematic architecture from forces to implementation?",
+    "title": "Quality Attributes — Flexibility Manager",
+    "prompt": "Which ISO 25010 quality attributes matter most for Flexibility Manager, and what trade-offs do they create?",
     "points": [
-      "Architecture = <strong>Forces + Creativity + Communication + Decisions</strong>",
-      "<strong>Forces = Requirements + Constraints</strong>; constraints include non-technical ones",
-      "<strong>ASR</strong> identified via <strong>5 miles wide, 5 inches deep</strong> method",
-      "<strong>L-model</strong>: vertical (elicit, domain, dynamics, scope) then horizontal (design to increments)",
-      "Maturity: <strong>Initial Draft → Walking Skeleton → MVP → MMP/MLP</strong>",
-      "<strong>Pyramid model</strong>: max 3 levels (System → Subsystem → Component) + cross-cutting",
-      "<strong>Inverse Conway Maneuver</strong>: design architecture first, then reorganize teams to match"
+      "Process: <strong>ISO 25010</strong> characteristics → project-specific NFRs → <strong>QAS prioritization</strong> → imported NFRs",
+      "Six <strong>\"Very High\"</strong> attributes: Functional Correctness, Time Behaviour, Availability, Integrity, Modularity, Replaceability",
+      "<strong>Availability</strong> is the top customer expectation — \"100% availability\" via redundancy (critical infrastructure)",
+      "<strong>Security / Integrity</strong>: unauthorized modification must be prevented — worst case is a blackout",
+      "Key trade-offs: <strong>Availability vs Performance</strong> (redundancy adds latency); <strong>Security vs Maintainability</strong> (access control adds coupling)",
+      "<strong>12 domain trade-offs</strong> mapped to bounded contexts <strong>CP, CPrev, CRR, M&amp;T</strong> (e.g. Accuracy ↔ Latency, Freshness ↔ Consistency)",
+      "Next step: expand each row into a full six-element <strong>Quality Scenario</strong> and record decisions as <strong>ADRs</strong>"
     ],
     "chapter": "blue-architecture"
   },

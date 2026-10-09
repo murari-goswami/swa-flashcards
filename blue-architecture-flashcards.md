@@ -162,17 +162,17 @@
 
 ---
 
-## 11. Systematic Architecture Design
+## 11. Quality Attributes — Flexibility Manager
 
-**How does the L-model drive systematic architecture from forces to implementation?**
+**Which ISO 25010 quality attributes matter most for Flexibility Manager, and what trade-offs do they create?**
 
-- Architecture = **Forces + Creativity + Communication + Decisions**
-- **Forces = Requirements + Constraints**; constraints include non-technical ones
-- **ASR** identified via **5 miles wide, 5 inches deep** method
-- **L-model**: vertical (elicit, domain, dynamics, scope) then horizontal (design to increments)
-- Maturity: **Initial Draft → Walking Skeleton → MVP → MMP/MLP**
-- **Pyramid model**: max 3 levels (System → Subsystem → Component) + cross-cutting
-- **Inverse Conway Maneuver**: design architecture first, then reorganize teams to match
+- Process: **ISO 25010** characteristics → project-specific NFRs → **QAS prioritization** → imported NFRs
+- Six **"Very High"** attributes: Functional Correctness, Time Behaviour, Availability, Integrity, Modularity, Replaceability
+- **Availability** is the top customer expectation — "100% availability" via redundancy (critical infrastructure)
+- **Security / Integrity**: unauthorized modification must be prevented — worst case is a blackout
+- Key trade-offs: **Availability vs Performance** (redundancy adds latency); **Security vs Maintainability** (access control adds coupling)
+- **12 domain trade-offs** mapped to bounded contexts **CP, CPrev, CRR, M&amp;T** (e.g. Accuracy ↔ Latency, Freshness ↔ Consistency)
+- Next step: expand each row into a full six-element **Quality Scenario** and record decisions as **ADRs**
 
 ---
 
